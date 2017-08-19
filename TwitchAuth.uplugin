@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "TwitchAuth",
+	"Description": "Unreal Engine 4 Plugin for In-Game Twitch Authentication.",
+	"Category": "fivefingergames",
+	"CreatedBy": "fivefingergames",
+	"CreatedByURL": "https://fivefingergames.com",
+	"DocsURL": "https://fivefingergames.com/twitchauth",
+	"MarketplaceURL": "",
+	"SupportURL": "support@fivefingergames.com",
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "TwitchAuth",
+			"Type": "Runtime",
+			"LoadingPhase": "PreLoadingScreen"
+		}
+	]
+}
