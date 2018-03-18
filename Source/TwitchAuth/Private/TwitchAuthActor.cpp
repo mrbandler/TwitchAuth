@@ -1,7 +1,8 @@
 // Copyright (c) 2018 fivefingergames.
 
 #include "TwitchAuthActor.h"
-#include "Core.h"
+#include "CoreMinimal.h"
+#include "Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
@@ -50,6 +51,19 @@ void ATwitchAuthActor::StartUserSignIn()
 {
     TSharedPtr<SWidget> widget = CreateWebBrowserWidget();
     AddWidgetToViewport(widget);
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, FString ChannelName)
+{
+    ExecuteGetTwitchChannelRequest(ChannelName);
+}
+
+FString ATwitchAuthActor::GetLastErrorMessage()
+{
+    return m_LastErrorMessage;
 }
 
 #pragma endregion // Blueprint Interaction
@@ -105,7 +119,7 @@ void ATwitchAuthActor::HandleOnUrlChanged(const FText & InText)
     FString url = InText.ToString();
     if(url.Contains(AccessTokenUriContainsStr) == true)
     {
-        m_AccessToken = GetAccessToken(url);
+        AccessToken = GetAccessToken(url);
         RemoveWidgetFromViewport(WeakWidget);
         ExecuteGetTwitchUserRequest();
     }
@@ -144,7 +158,7 @@ FString ATwitchAuthActor::GetTwitchSigninUrl()
     {
         Url += "&force_varify=true";
     }
-    Url += "&scope=user_subscriptions user_read";
+    Url += "&scope=user_read user_subscriptions";
 
     return Url;
 }
@@ -164,7 +178,9 @@ TSharedRef<IHttpRequest> ATwitchAuthActor::CreateHttpRequest(FString Endpoint, E
     // Set the endpoint URL and the authorization header.
     FString url = m_ApiBaseUrl + Endpoint;
     result->SetURL(url);
-    result->SetHeader(TEXT("Authorization"), TEXT("OAuth " + m_AccessToken));
+    result->SetHeader(TEXT("Authorization"), TEXT("OAuth " + AccessToken));
+    result->SetHeader(TEXT("Client-ID"), ClientID);
+    result->SetHeader(TEXT("Accept"), TEXT("application/vnd.twitchtv.v5+json"));
 
     // Last but not least set the HTTP verb.
     FString verbStr = GetHttpVerbStr(Verb);
@@ -239,37 +255,34 @@ void ATwitchAuthActor::OnResponseReceived(FHttpRequestPtr Request, FHttpResponse
         switch(m_LastEndpoint)
         {
             case EEndpoint::User: 
-                HandleGetTwitchUserResponse(Request, Response);
-                OnUserSignedIn();
+                m_LastEndpoint = EEndpoint::None;
 
+                HandleGetTwitchUserResponse(Request, Response);
                 break;
+
             case EEndpoint::Channels:
+                m_LastEndpoint = EEndpoint::None;
+
+                HandleGetTwitchChannelResponse(Request, Response);
                 break;
+
             case EEndpoint::Subscriptions:
+                m_LastEndpoint = EEndpoint::None;
+
+                HandleCheckUserSubscriptionResponse(Request, Response);
                 break;
+
             default:
                 break;
         }
-
-        // Finally we set the last endpoint back to 
-        m_LastEndpoint = EEndpoint::None;
     }
-}
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-template<typename T>
-T ATwitchAuthActor::GetStructFromJsonString(const FString& JsonString)
-{
-    // Init the result.
-    T result = T();
-
-    // Convert the string to the needed struct.
-    FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &result, 0, 0);
-
-    // Finally return the struct created.
-    return result;
+    else
+    {
+        if(m_LastEndpoint == EEndpoint::Subscriptions)
+        {
+            OnTwitchUserSubscribedToChannel(false, m_TwitchSubscription);
+        }
+    }
 }
 
 #pragma endregion // HTTP API
@@ -300,7 +313,87 @@ void ATwitchAuthActor::HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHtt
     const FString responseBody = Response->GetContentAsString();
 
     // And convert the body to a struct.
-    m_TwitchUser = GetStructFromJsonString<FTwitchUser>(responseBody);
+    if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchUser>(responseBody, &m_TwitchUser, 0, 0) == true)
+    {
+        OnUserSignedIn();
+    }
+    else
+    {
+        //TODO: Handle the error here.
+    }
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::ExecuteGetTwitchChannelRequest(FString ChannelName)
+{
+    const FString endpoint = m_ChannelEndpoint + ChannelName;
+    TSharedRef<IHttpRequest> request = CreateHttpRequest(endpoint, EHttpVerb::Get);
+    m_LastEndpoint = EEndpoint::Channels;
+    request->ProcessRequest();
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::HandleGetTwitchChannelResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
+{
+    // Get the response body as a string.
+    FString responseBody = Response->GetContentAsString();
+    responseBody = RetrieveTwitchChannelUserFromResponseBody(responseBody);
+
+    // And convert the body to a struct.
+    if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchChannelUser>(responseBody, &m_TwitchChannelUser, 0, 0) == true)
+    {
+        ExecuteCheckUserSubscriptionRequest(m_TwitchUser, m_TwitchChannelUser);
+    }
+    else
+    {
+        //TODO: Handle the error here.
+    }
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::ExecuteCheckUserSubscriptionRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel)
+{
+    FString endpoint = m_SubscriptionEndpoint;
+    endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
+    endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
+
+    TSharedRef<IHttpRequest> request = CreateHttpRequest(endpoint, EHttpVerb::Get);
+    m_LastEndpoint = EEndpoint::Subscriptions;
+    request->ProcessRequest();
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::HandleCheckUserSubscriptionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
+{
+    const FString responseBody = Response->GetContentAsString();
+
+    // And convert the body to a struct.
+    if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchSubscription>(responseBody, &m_TwitchSubscription, 0, 0) == true)
+    {
+        OnTwitchUserSubscribedToChannel(true, m_TwitchSubscription);
+    }
+    else
+    {
+        //TODO: Handle the error here.
+    }
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+FString ATwitchAuthActor::RetrieveTwitchChannelUserFromResponseBody(const FString& ResponseBody) const
+{
+    int32 index     = ResponseBody.Find("[") + 1;
+    int32 charCount = (ResponseBody.Len() - 2) - index;
+    return ResponseBody.Mid(index, charCount);
 }
 
 #pragma endregion // Twitch API Endpoints

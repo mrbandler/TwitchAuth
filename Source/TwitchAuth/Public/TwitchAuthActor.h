@@ -32,22 +32,89 @@ enum class EEndpoint : uint8
     Subscriptions
 };
 
+USTRUCT(BlueprintType)
+struct TWITCHAUTH_API FTwitchUserNotifications
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly) bool push;
+    UPROPERTY(BlueprintReadOnly) bool email;
+
+    FTwitchUserNotifications() {}
+};
+
+/// <summary>
+/// This struct represents a Twitch channel user.
+/// </summary>
+USTRUCT(BlueprintType)
+struct TWITCHAUTH_API FTwitchChannelUser
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly) FString display_name;
+    UPROPERTY(BlueprintReadOnly) FString _id;
+    UPROPERTY(BlueprintReadOnly) FString name;
+    UPROPERTY(BlueprintReadOnly) FString type;
+    UPROPERTY(BlueprintReadOnly) FString bio;
+    UPROPERTY(BlueprintReadOnly) FString created_at;
+    UPROPERTY(BlueprintReadOnly) FString updated_at;
+    UPROPERTY(BlueprintReadOnly) FString logo;
+
+    FTwitchChannelUser() {}
+};
+
 /// <summary>
 /// This struct represents the signed in Twitch user.
 /// </summary>
 USTRUCT(BlueprintType)
-struct TWITCHAUTH_API FTwitchUser
+struct TWITCHAUTH_API FTwitchUser : public FTwitchChannelUser
 {
     GENERATED_BODY()
-           
-    UPROPERTY() FString _id;
-    UPROPERTY() FString logo;
-    UPROPERTY(BlueprintReadOnly) FString display_name;
-    UPROPERTY(BlueprintReadOnly) FString name;
-    UPROPERTY(BlueprintReadOnly) FString bio;
-    UPROPERTY(BlueprintReadOnly) FString email;
 
-    FTwitchUser()  {}
+    UPROPERTY(BlueprintReadOnly) FString email;
+    UPROPERTY(BlueprintReadOnly) bool email_verified;
+    UPROPERTY(BlueprintReadOnly) bool partnered;
+    UPROPERTY(BlueprintReadOnly) bool twitter_connected;
+    UPROPERTY(BlueprintReadOnly) FTwitchUserNotifications notifications;
+
+    FTwitchUser() {}
+};
+
+USTRUCT(BlueprintType)
+struct TWITCHAUTH_API FTwitchChannel
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly) bool mature;
+    UPROPERTY(BlueprintReadOnly) FString status;
+    UPROPERTY(BlueprintReadOnly) FString broadcaster_language;
+    UPROPERTY(BlueprintReadOnly) FString game;
+    UPROPERTY(BlueprintReadOnly) FString language;
+    UPROPERTY(BlueprintReadOnly) FString name;
+    UPROPERTY(BlueprintReadOnly) FString created_at;
+    UPROPERTY(BlueprintReadOnly) FString updated_at;
+    UPROPERTY(BlueprintReadOnly) FString _id;
+    UPROPERTY(BlueprintReadOnly) FString logo;
+    UPROPERTY(BlueprintReadOnly) FString video_banner;
+    UPROPERTY(BlueprintReadOnly) FString profile_banner;
+    UPROPERTY(BlueprintReadOnly) FString profile_banner_background_color;
+    UPROPERTY(BlueprintReadOnly) bool partner;
+    UPROPERTY(BlueprintReadOnly) FString url;
+    UPROPERTY(BlueprintReadOnly) int32 views;
+    UPROPERTY(BlueprintReadOnly) int32 followers;
+};
+
+USTRUCT(BlueprintType)
+struct TWITCHAUTH_API FTwitchSubscription
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly) FString created_at;
+    UPROPERTY(BlueprintReadOnly) FString _id;
+    UPROPERTY(BlueprintReadOnly) FString sub_plan;
+    UPROPERTY(BlueprintReadOnly) FString sub_plan_name;
+    UPROPERTY(BlueprintReadOnly) bool is_gift;
+    UPROPERTY(BlueprintReadOnly) FTwitchChannel channel;
 };
 
 /// <summary>
@@ -78,16 +145,29 @@ public:
     bool ForceVerify = true;
 
     /// <summary>
+    /// Twitch user access token that can be optained via the StartUserSignIn method.
+    /// If the access token has been saved to disk it can be set here to skip the sign in process.
+    /// </summary>
+    UPROPERTY(EditAnywhere, Category = "Twitch Auth")
+    FString AccessToken;
+
+    /// <summary>
     /// Start the sign  in process with web browser and all.
     /// </summary>
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
-        void StartUserSignIn();
+    void StartUserSignIn();
+
+    UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
+    FString GetLastErrorMessage();
 
     /// <summary>
     /// Returns the signed in twitch user.
     /// </summary>
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     FTwitchUser GetSignedInTwitchUser();
+
+    UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
+    void IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, FString ChannelName);
 
 protected:
 
@@ -103,11 +183,20 @@ protected:
     #pragma region Blueprint Interaction
 
     /// <summary>
+    /// This is always the last error message from within the current state of the actor.
+    /// </summary>
+    FString m_LastErrorMessage;
+
+    /// <summary>
     /// This is a custom event which is fired when the user signed in successfully.
     /// </summary>
     UFUNCTION(BlueprintNativeEvent, Category = "Twitch Auth")
     void OnUserSignedIn();
     void OnUserSignedIn_Implementation() {}
+
+    UFUNCTION(BlueprintNativeEvent, Category = "Twitch Auth")
+    void OnTwitchUserSubscribedToChannel(bool bSubscribed, FTwitchSubscription TwitchSubscription);
+    void OnTwitchUserSubscribedToChannel_Implementation(bool bSubscribed, FTwitchSubscription TwitchSubscription) {}
 
     #pragma endregion // Blueprint Interaction
 
@@ -143,20 +232,6 @@ private:
     /// <returns>Flag, wheter the response is valid or not.</returns>
     bool IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful);
 
-    
-    /// <summary>
-    /// Populates a struct for a given JSON string.
-    ///   
-    /// NOTE: This is a template method which means you 
-    ///       can specify which type of struct you want to 
-    ///       populate.
-    ///  
-    /// USAGE: FTwitchUser twitchUser = GetStructFromJsonString<FTwitchUser>(json);
-    /// </summary>
-    /// <param name="JsonString">JSON string.</param>
-    /// <returns>Populated struct.</returns>
-    template <typename T>
-    T GetStructFromJsonString(const FString& JsonString);
 
     /// <summary>
     /// Common callback function for any HTTP requests made.
@@ -168,48 +243,7 @@ private:
     
     #pragma endregion // HTTP API
 
-    #pragma region Twitch API Endpoints
-
-    /// <summary>
-    /// Base API URL.
-    /// </summary>
-    FString m_ApiBaseUrl = "https://api.twitch.tv/kraken";
-    
-    /// <summary>
-    /// Twitch API Endpoints.
-    /// </summary>
-    FString m_UserEndpoint = "/user";
-    
-    /// <summary>
-    /// Keeps track of what endpoint was last requested to.
-    /// </summary>
-    EEndpoint m_LastEndpoint = EEndpoint::None;
-
-    /// <summary>
-    /// Signed in Twitch user from the browser module.
-    /// </summary>
-    FTwitchUser m_TwitchUser;
-
-    /// <summary>
-    /// Executes the GET /user endpoint request.
-    /// </summary>
-    void ExecuteGetTwitchUserRequest();
-
-    /// <summary>
-    /// Handles the GET /user endpoint response.
-    /// </summary>
-    /// <param name="Request">Request made.</param>
-    /// <param name="Response">Returned response.</param>
-    void HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
-
-    #pragma endregion // Twitch API Endpoints
-
     #pragma region Web Browser Widget
-
-    /// <summary>
-    /// User access token that we receive from the Twitch redirect URI.
-    /// </summary>
-    FString m_AccessToken;
 
     /// <summary>
     /// Access token key definition which is used to cut out the access token from the redirect URI.
@@ -268,6 +302,77 @@ private:
     /// <param name="InText">New URL.</param>
     void HandleOnUrlChanged(const FText& InText);
     
-    #pragma endregion
-    
+    #pragma endregion // Web Browser Widget
+
+    #pragma region Twitch API Endpoints
+
+    /// <summary>
+    /// Base API URL.
+    /// </summary>
+    FString m_ApiBaseUrl = "https://api.twitch.tv/kraken";
+
+    /// <summary>
+    /// Twitch API Endpoints.
+    /// </summary>
+    FString m_UserEndpoint = "/user";
+    FString m_ChannelEndpoint = "/users?login=";
+    FString m_SubscriptionEndpoint = "/users/$1/subscriptions/$2";
+
+    /// <summary>
+    /// Keeps track of what endpoint was last requested to.
+    /// </summary>
+    EEndpoint m_LastEndpoint = EEndpoint::None;
+
+    /// <summary>
+    /// Signed in Twitch user from the browser module.
+    /// </summary>
+    FTwitchUser m_TwitchUser;
+
+    /// <summary>
+    /// Twitch channel user from the GetTwitchChannel request.
+    /// </summary>
+    FTwitchChannelUser m_TwitchChannelUser;
+
+    FTwitchSubscription m_TwitchSubscription;
+
+    FString RetrieveTwitchChannelUserFromResponseBody(const FString& ResponseBody) const;
+
+    /// <summary>
+    /// Executes the GET /user endpoint request.
+    /// </summary>
+    void ExecuteGetTwitchUserRequest();
+
+    /// <summary>
+    /// Handles the GET /user endpoint response.
+    /// </summary>
+    /// <param name="Request">Request made.</param>
+    /// <param name="Response">Returned response.</param>
+    void HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+
+    /// <summary>
+    /// Executes the GET /user endpoint request.
+    /// </summary>
+    void ExecuteGetTwitchChannelRequest(FString ChannelName);
+
+    /// <summary>
+    /// Handles the GET /user endpoint response.
+    /// </summary>
+    /// <param name="Request">Request made.</param>
+    /// <param name="Response">Returned response.</param>
+    void HandleGetTwitchChannelResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+
+    /// <summary>
+    /// Executes the GET /user endpoint request.
+    /// </summary>
+    void ExecuteCheckUserSubscriptionRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel);
+
+    /// <summary>
+    /// Handles the GET /user endpoint response.
+    /// </summary>
+    /// <param name="Request">Request made.</param>
+    /// <param name="Response">Returned response.</param>
+    void HandleCheckUserSubscriptionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+
+    #pragma endregion // Twitch API Endpoints
+
 };

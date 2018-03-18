@@ -11,7 +11,6 @@ public class TwitchAuth : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				"TwitchAuth/Public",
-                "TwitchAuth/Public/Widgets"
 				
 				// ... add public include paths required here ...
 			}
@@ -21,7 +20,6 @@ public class TwitchAuth : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"TwitchAuth/Private",
-                "TwitchAuth/Private/Widgets"
 
 				// ... add other private include paths required here ...
 			}
@@ -31,7 +29,7 @@ public class TwitchAuth : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core"
+				"Core",
         	
 				// ... add other public dependencies that you statically link with here ...
 			}
@@ -49,7 +47,7 @@ public class TwitchAuth : ModuleRules
                 "WebBrowser",
                 "Http",
                 "Json",
-                "JsonUtilities"
+                "JsonUtilities",
 
 				// ... add private dependencies that you statically link with here ...	
 			}
