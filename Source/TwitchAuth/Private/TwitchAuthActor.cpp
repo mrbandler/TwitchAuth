@@ -21,15 +21,7 @@ ATwitchAuthActor::ATwitchAuthActor()
 }
 
 #pragma region UE4 Overrides
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-void ATwitchAuthActor::BeginPlay()
-{
-	Super::BeginPlay();	
-}
-
+    // Nothing to do here...
 #pragma endregion // UE4 Overrides
 
 #pragma region Public
@@ -49,8 +41,15 @@ FTwitchUser ATwitchAuthActor::GetSignedInTwitchUser()
 /************************************************************************/
 void ATwitchAuthActor::StartUserSignIn()
 {
-    TSharedPtr<SWidget> widget = CreateWebBrowserWidget();
-    AddWidgetToViewport(widget);
+    if(m_AccessToken != "")
+    {
+        ExecuteGetTwitchUserRequest();
+    }
+    else 
+    {  
+        TSharedPtr<SWidget> widget = CreateWebBrowserWidget();
+        AddWidgetToViewport(widget);
+    }
 }
 
 /************************************************************************/
@@ -61,9 +60,36 @@ void ATwitchAuthActor::IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, F
     ExecuteGetTwitchChannelRequest(ChannelName);
 }
 
-FString ATwitchAuthActor::GetLastErrorMessage()
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+FError ATwitchAuthActor::GetLastError()
 {
-    return m_LastErrorMessage;
+    return m_LastError;
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+FString ATwitchAuthActor::GetAccessToken()
+{
+    return m_AccessToken;
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::SetAccessToken(FString AccessToken)
+{
+    m_AccessToken = AccessToken;
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::ClearAccessToken()
+{
+    m_AccessToken = "";
 }
 
 #pragma endregion // Blueprint Interaction
@@ -71,6 +97,8 @@ FString ATwitchAuthActor::GetLastErrorMessage()
 #pragma endregion // Public
 
 #pragma region Protected
+
+// Nothing todo here..
 
 #pragma endregion // Protected
 
@@ -119,7 +147,7 @@ void ATwitchAuthActor::HandleOnUrlChanged(const FText & InText)
     FString url = InText.ToString();
     if(url.Contains(AccessTokenUriContainsStr) == true)
     {
-        AccessToken = GetAccessToken(url);
+        m_AccessToken = GetAccessToken(url);
         RemoveWidgetFromViewport(WeakWidget);
         ExecuteGetTwitchUserRequest();
     }
@@ -178,7 +206,7 @@ TSharedRef<IHttpRequest> ATwitchAuthActor::CreateHttpRequest(FString Endpoint, E
     // Set the endpoint URL and the authorization header.
     FString url = m_ApiBaseUrl + Endpoint;
     result->SetURL(url);
-    result->SetHeader(TEXT("Authorization"), TEXT("OAuth " + AccessToken));
+    result->SetHeader(TEXT("Authorization"), TEXT("OAuth " + m_AccessToken));
     result->SetHeader(TEXT("Client-ID"), ClientID);
     result->SetHeader(TEXT("Accept"), TEXT("application/vnd.twitchtv.v5+json"));
 
@@ -280,7 +308,15 @@ void ATwitchAuthActor::OnResponseReceived(FHttpRequestPtr Request, FHttpResponse
     {
         if(m_LastEndpoint == EEndpoint::Subscriptions)
         {
-            OnTwitchUserSubscribedToChannel(false, m_TwitchSubscription);
+            UE_LOG(LogTemp, Warning, TEXT("No valid subscription found"));
+
+            FError error;
+            error.Error = EError::NoSubscriptionFound;
+            error.Message = "No valid subscription found";
+
+            m_LastError = error;
+
+            OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
         }
     }
 }
@@ -315,11 +351,19 @@ void ATwitchAuthActor::HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHtt
     // And convert the body to a struct.
     if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchUser>(responseBody, &m_TwitchUser, 0, 0) == true)
     {
-        OnUserSignedIn();
+        OnUserSignedIn.Broadcast(true);
     }
     else
     {
-        //TODO: Handle the error here.
+        UE_LOG(LogTemp, Warning, TEXT("User could not be authenticated."));
+
+        FError error;
+        error.Error = EError::SignInFailed;
+        error.Message = "User could not be authenticated.";
+
+        m_LastError = error;
+
+        OnUserSignedIn.Broadcast(false);
     }
 }
 
@@ -350,7 +394,15 @@ void ATwitchAuthActor::HandleGetTwitchChannelResponse(FHttpRequestPtr Request, F
     }
     else
     {
-        //TODO: Handle the error here.
+        UE_LOG(LogTemp, Warning, TEXT("Channel could not be found"));
+
+        FError error;
+        error.Error = EError::ChannelNotFound;
+        error.Message = "Channel could not be found";
+
+        m_LastError = error;
+
+        OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
     }
 }
 
@@ -378,11 +430,19 @@ void ATwitchAuthActor::HandleCheckUserSubscriptionResponse(FHttpRequestPtr Reque
     // And convert the body to a struct.
     if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchSubscription>(responseBody, &m_TwitchSubscription, 0, 0) == true)
     {
-        OnTwitchUserSubscribedToChannel(true, m_TwitchSubscription);
+        OnTwitchUserSubscribedToChannel.Broadcast(true, m_TwitchSubscription);
     }
     else
     {
-        //TODO: Handle the error here.
+        UE_LOG(LogTemp, Warning, TEXT("No valid subscription found"));
+
+        FError error;
+        error.Error = EError::NoSubscriptionFound;
+        error.Message = "No valid subscription found";
+
+        m_LastError = error;
+
+        OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
     }
 }
 

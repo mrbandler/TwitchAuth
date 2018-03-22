@@ -32,6 +32,15 @@ enum class EEndpoint : uint8
     Subscriptions
 };
 
+UENUM(BlueprintType)
+enum class EError : uint8
+{
+    None,
+    SignInFailed,
+    ChannelNotFound,
+    NoSubscriptionFound
+};
+
 USTRUCT(BlueprintType)
 struct TWITCHAUTH_API FTwitchUserNotifications
 {
@@ -102,6 +111,8 @@ struct TWITCHAUTH_API FTwitchChannel
     UPROPERTY(BlueprintReadOnly) FString url;
     UPROPERTY(BlueprintReadOnly) int32 views;
     UPROPERTY(BlueprintReadOnly) int32 followers;
+
+    FTwitchChannel() {}
 };
 
 USTRUCT(BlueprintType)
@@ -115,7 +126,23 @@ struct TWITCHAUTH_API FTwitchSubscription
     UPROPERTY(BlueprintReadOnly) FString sub_plan_name;
     UPROPERTY(BlueprintReadOnly) bool is_gift;
     UPROPERTY(BlueprintReadOnly) FTwitchChannel channel;
+
+    FTwitchSubscription() {}
 };
+
+USTRUCT(BlueprintType)
+struct TWITCHAUTH_API FError
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly) EError Error;
+    UPROPERTY(BlueprintReadOnly) FString Message;
+
+    FError() {}
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserSignedIn, bool, SignedIn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTwitchUserSubscribedToChannel, bool, bSubscribed, FTwitchSubscription, TwitchSubscription);
 
 /// <summary>
 /// With this actor you can build your complete Twitch user sign in process.
@@ -132,52 +159,53 @@ public:
     /// </summary>
 	ATwitchAuthActor();
 
-    /// <summary>
-    /// Client ID that is used to authenticate the Twitch user.
-    /// </summary>
+    // Client ID that is used to authenticate the Twitch user.
     UPROPERTY(EditAnywhere, Category = "Twitch Auth")
     FString ClientID;
 
-    /// <summary>
-    /// Flag, wheter the user should be verified every time.
-    /// </summary>
+    // Flag, wheter the user should be verified every time.
     UPROPERTY(EditAnywhere, Category = "Twitch Auth")
     bool ForceVerify = true;
 
-    /// <summary>
-    /// Twitch user access token that can be optained via the StartUserSignIn method.
-    /// If the access token has been saved to disk it can be set here to skip the sign in process.
-    /// </summary>
-    UPROPERTY(EditAnywhere, Category = "Twitch Auth")
-    FString AccessToken;
+    UPROPERTY(BlueprintAssignable)
+    FOnUserSignedIn OnUserSignedIn;
 
-    /// <summary>
-    /// Start the sign  in process with web browser and all.
-    /// </summary>
+    UPROPERTY(BlueprintAssignable)
+    FOnTwitchUserSubscribedToChannel OnTwitchUserSubscribedToChannel;
+
+    // Start the sign in process with web browser if the user is not yet authenticated..
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     void StartUserSignIn();
 
-    UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
-    FString GetLastErrorMessage();
-
-    /// <summary>
-    /// Returns the signed in twitch user.
-    /// </summary>
+    // Returns a struct of the signed in Twitch user.
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     FTwitchUser GetSignedInTwitchUser();
 
+    // Starts a checking process if a given Twitch user is a subscriber to a given channel.
+    // This function will trigger the OnTwitchUserSubscribedToChannel event.
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     void IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, FString ChannelName);
+
+    // Returns the retrieved access token from the sign in process.
+    UFUNCTION(BlueprintPure, Category = "Twitch Auth")
+    FString GetAccessToken();
+    
+    // Sets the access token if it has been saved to disk.
+    UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
+    void SetAccessToken(FString AccessToken);
+
+    // Clears the access token.
+    UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
+    void ClearAccessToken();
+
+    // Returns the last written error.
+    UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
+    FError GetLastError();
 
 protected:
 
     #pragma region UE4 Overrides
-
-    /// /// <summary>
-    /// Will be called when this actor will be spawned.
-    /// </summary>
-	virtual void BeginPlay() override;
-
+    // Nothing to do here...
     #pragma endregion
 
     #pragma region Blueprint Interaction
@@ -185,18 +213,12 @@ protected:
     /// <summary>
     /// This is always the last error message from within the current state of the actor.
     /// </summary>
-    FString m_LastErrorMessage;
-
+    FError m_LastError;
+    
     /// <summary>
-    /// This is a custom event which is fired when the user signed in successfully.
+    /// Access token that has been received from the Twitch sign in.
     /// </summary>
-    UFUNCTION(BlueprintNativeEvent, Category = "Twitch Auth")
-    void OnUserSignedIn();
-    void OnUserSignedIn_Implementation() {}
-
-    UFUNCTION(BlueprintNativeEvent, Category = "Twitch Auth")
-    void OnTwitchUserSubscribedToChannel(bool bSubscribed, FTwitchSubscription TwitchSubscription);
-    void OnTwitchUserSubscribedToChannel_Implementation(bool bSubscribed, FTwitchSubscription TwitchSubscription) {}
+    FString m_AccessToken;
 
     #pragma endregion // Blueprint Interaction
 
@@ -231,7 +253,6 @@ private:
     /// <param name="bWasSuccessful">Flag, wheter the request went fully through.</param>
     /// <returns>Flag, wheter the response is valid or not.</returns>
     bool IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful);
-
 
     /// <summary>
     /// Common callback function for any HTTP requests made.
@@ -333,8 +354,16 @@ private:
     /// </summary>
     FTwitchChannelUser m_TwitchChannelUser;
 
+    /// <summary>
+    /// Twitch subscription from the CheckUserSubcription request.
+    /// </summary>
     FTwitchSubscription m_TwitchSubscription;
 
+    /// <summary>
+    /// Pulls out the JSON from the channel request.
+    /// </summary>
+    /// <param name="ResponseBody">JSON response body from the request.</param>
+    /// <returns>Cleared JSON.</returns>
     FString RetrieveTwitchChannelUserFromResponseBody(const FString& ResponseBody) const;
 
     /// <summary>
