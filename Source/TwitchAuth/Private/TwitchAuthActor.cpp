@@ -63,7 +63,8 @@ void ATwitchAuthActor::IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, F
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-FError ATwitchAuthActor::GetLastError()
+
+FTwitchError ATwitchAuthActor::GetLastError()
 {
     return m_LastError;
 }
@@ -98,7 +99,14 @@ void ATwitchAuthActor::ClearAccessToken()
 
 #pragma region Protected
 
-// Nothing todo here..
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+void ATwitchAuthActor::LogError(const FTwitchError& twitchError)
+{
+    FString logMessage = twitchError.error + "(" + FString::FromInt(twitchError.status) + "): " + twitchError.message;
+    UE_LOG(LogTemp, Warning, TEXT("%s"), *logMessage);
+}
 
 #pragma endregion // Protected
 
@@ -109,8 +117,24 @@ void ATwitchAuthActor::ClearAccessToken()
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
+void ATwitchAuthActor::EnableCursor(bool bEnable)
+{
+    const UWorld* world = GetWorld();
+    if (world != nullptr)
+    {
+        APlayerController* playerController = world->GetFirstPlayerController();
+        playerController->bShowMouseCursor = bEnable;
+        playerController->bEnableClickEvents = bEnable;
+        playerController->bEnableMouseOverEvents = bEnable;
+    }
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 void ATwitchAuthActor::AddWidgetToViewport(TSharedPtr<SWidget> Widget)
 {
+    EnableCursor(true);
     WeakWidget = SNew(SWeakWidget).PossiblyNullContent(Widget.ToSharedRef());
     GEngine->GameViewport->AddViewportWidgetContent(WeakWidget.ToSharedRef());
     Widget->SetVisibility(EVisibility::Visible);
@@ -121,6 +145,7 @@ void ATwitchAuthActor::AddWidgetToViewport(TSharedPtr<SWidget> Widget)
 /************************************************************************/
 void ATwitchAuthActor::RemoveWidgetFromViewport(TSharedPtr<SWidget> Widget)
 {
+    EnableCursor(false);
     GEngine->GameViewport->RemoveViewportWidgetContent(Widget.ToSharedRef());
 }
 
@@ -150,6 +175,10 @@ void ATwitchAuthActor::HandleOnUrlChanged(const FText & InText)
         m_AccessToken = GetAccessToken(url);
         RemoveWidgetFromViewport(WeakWidget);
         ExecuteGetTwitchUserRequest();
+    }
+    else
+    {
+        OnSignInPageLoaded.Broadcast();
     }
 }
 
@@ -306,17 +335,25 @@ void ATwitchAuthActor::OnResponseReceived(FHttpRequestPtr Request, FHttpResponse
     }
     else
     {
-        if(m_LastEndpoint == EEndpoint::Subscriptions)
+        FString responseBody = Response->GetContentAsString();
+        FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchError>(responseBody, &m_LastError, 0, 0);
+ 
+        switch(m_LastEndpoint)
         {
-            UE_LOG(LogTemp, Warning, TEXT("No valid subscription found"));
+            case EEndpoint::Subscriptions:
+                LogError(m_LastError);
+                OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
+                break;
 
-            FError error;
-            error.Error = EError::NoSubscriptionFound;
-            error.Message = "No valid subscription found";
+            case EEndpoint::Channels:
+                LogError(m_LastError);
+                OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
+                break;
 
-            m_LastError = error;
-
-            OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
+            case EEndpoint::User:
+                LogError(m_LastError);
+                OnUserSignedIn.Broadcast(false);
+                break;
         }
     }
 }
@@ -355,14 +392,6 @@ void ATwitchAuthActor::HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHtt
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("User could not be authenticated."));
-
-        FError error;
-        error.Error = EError::SignInFailed;
-        error.Message = "User could not be authenticated.";
-
-        m_LastError = error;
-
         OnUserSignedIn.Broadcast(false);
     }
 }
@@ -394,14 +423,14 @@ void ATwitchAuthActor::HandleGetTwitchChannelResponse(FHttpRequestPtr Request, F
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("Channel could not be found"));
+        FTwitchError twitchError;
+        twitchError.error = "Not Found";
+        twitchError.status = 404;
+        twitchError.message = "Channel could not be found";
 
-        FError error;
-        error.Error = EError::ChannelNotFound;
-        error.Message = "Channel could not be found";
+        m_LastError = twitchError;
 
-        m_LastError = error;
-
+        LogError(m_LastError);
         OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
     }
 }
@@ -431,18 +460,6 @@ void ATwitchAuthActor::HandleCheckUserSubscriptionResponse(FHttpRequestPtr Reque
     if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchSubscription>(responseBody, &m_TwitchSubscription, 0, 0) == true)
     {
         OnTwitchUserSubscribedToChannel.Broadcast(true, m_TwitchSubscription);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No valid subscription found"));
-
-        FError error;
-        error.Error = EError::NoSubscriptionFound;
-        error.Message = "No valid subscription found";
-
-        m_LastError = error;
-
-        OnTwitchUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
     }
 }
 

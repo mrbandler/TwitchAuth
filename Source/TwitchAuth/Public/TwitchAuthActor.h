@@ -7,9 +7,11 @@
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "TwitchAuthActor.generated.h"
 
-/// <summary>
-/// All needed HTTP verbs.
-/// </summary>
+/**
+ * @enum    EHttpVerb
+ *
+ * @brief   Values that represent HTTP verbs.
+ */
 UENUM()
 enum class EHttpVerb : uint8
 {
@@ -20,9 +22,11 @@ enum class EHttpVerb : uint8
 	Delete
 };
 
-/// <summary>
-/// All possible endpoints.
-/// </summary>
+/**
+ * @enum    EEndpoint
+ *
+ * @brief   Values that represent all possible endpoints to the Twitch API.
+ */
 UENUM()
 enum class EEndpoint : uint8
 {
@@ -32,15 +36,12 @@ enum class EEndpoint : uint8
     Subscriptions
 };
 
-UENUM(BlueprintType)
-enum class EError : uint8
-{
-    None,
-    SignInFailed,
-    ChannelNotFound,
-    NoSubscriptionFound
-};
-
+/**
+ * @struct  TWITCHAUTH_API TwitchAuthActor.h
+ *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   Twitch user notification settings.
+ */
 USTRUCT(BlueprintType)
 struct TWITCHAUTH_API FTwitchUserNotifications
 {
@@ -52,9 +53,12 @@ struct TWITCHAUTH_API FTwitchUserNotifications
     FTwitchUserNotifications() {}
 };
 
-/// <summary>
-/// This struct represents a Twitch channel user.
-/// </summary>
+/**
+ * @struct  TWITCHAUTH_API TwitchAuthActor.h
+ *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   Twich channel user.
+ */
 USTRUCT(BlueprintType)
 struct TWITCHAUTH_API FTwitchChannelUser
 {
@@ -72,9 +76,12 @@ struct TWITCHAUTH_API FTwitchChannelUser
     FTwitchChannelUser() {}
 };
 
-/// <summary>
-/// This struct represents the signed in Twitch user.
-/// </summary>
+/**
+ * @struct  TWITCHAUTH_API TwitchAuthActor.h
+ *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   Normal Twitch user.
+ */
 USTRUCT(BlueprintType)
 struct TWITCHAUTH_API FTwitchUser : public FTwitchChannelUser
 {
@@ -89,6 +96,12 @@ struct TWITCHAUTH_API FTwitchUser : public FTwitchChannelUser
     FTwitchUser() {}
 };
 
+/**
+ * @struct  TWITCHAUTH_API TwitchAuthActor.h
+ *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   Twitch channel.
+ */
 USTRUCT(BlueprintType)
 struct TWITCHAUTH_API FTwitchChannel
 {
@@ -115,6 +128,12 @@ struct TWITCHAUTH_API FTwitchChannel
     FTwitchChannel() {}
 };
 
+/**
+ * @struct  TWITCHAUTH_API TwitchAuthActor.h
+ *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   Twitch subscription.
+ */
 USTRUCT(BlueprintType)
 struct TWITCHAUTH_API FTwitchSubscription
 {
@@ -131,76 +150,136 @@ struct TWITCHAUTH_API FTwitchSubscription
 };
 
 USTRUCT(BlueprintType)
-struct TWITCHAUTH_API FError
+
+/**
+ * @struct  TWITCHAUTH_API TwitchAuthActor.h
+ *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   Twitch error from the Twitch API.
+ */
+struct TWITCHAUTH_API FTwitchError
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) EError Error;
-    UPROPERTY(BlueprintReadOnly) FString Message;
+    UPROPERTY(BlueprintReadOnly) FString error;
+    UPROPERTY(BlueprintReadOnly) int32 status;
+    UPROPERTY(BlueprintReadOnly) FString message;
 
-    FError() {}
+    FTwitchError() {}
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSignInPageLoaded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserSignedIn, bool, SignedIn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTwitchUserSubscribedToChannel, bool, bSubscribed, FTwitchSubscription, TwitchSubscription);
 
-/// <summary>
-/// With this actor you can build your complete Twitch user sign in process.
-/// </summary>
+
 UCLASS()
+/**
+ * @class   TWITCHAUTH_API TwitchAuthActor.h
+ *          d:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthActor.h
+ *
+ * @brief   With this actor you can build your complete Twitch user sign in process.
+ */
 class TWITCHAUTH_API ATwitchAuthActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-    
-    /// /// <summary>
-    /// Default constructor.
-    /// </summary>
+
+    /**
+     * @fn  ATwitchAuthActor::ATwitchAuthActor();
+     *
+     * @brief   Default constructor.
+     */
 	ATwitchAuthActor();
 
-    // Client ID that is used to authenticate the Twitch user.
+    /** @brief   Client ID that is used to authenticate the Twitch user. */
     UPROPERTY(EditAnywhere, Category = "Twitch Auth")
     FString ClientID;
 
-    // Flag, wheter the user should be verified every time.
+    /** @brief   Flag, whether the user should be verified every time. */
     UPROPERTY(EditAnywhere, Category = "Twitch Auth")
     bool ForceVerify = true;
 
+    /** @brief   Event that will be fired when the Twitch user signed in. */
     UPROPERTY(BlueprintAssignable)
     FOnUserSignedIn OnUserSignedIn;
 
+    /** @brief   Event that will be fired after the Twitch user sub to channel method. */
     UPROPERTY(BlueprintAssignable)
     FOnTwitchUserSubscribedToChannel OnTwitchUserSubscribedToChannel;
+    
+    /** @brief    Event that will be fired when the sign in page will be loaded up. */
+    UPROPERTY(BlueprintAssignable)
+    FOnSignInPageLoaded OnSignInPageLoaded;
 
-    // Start the sign in process with web browser if the user is not yet authenticated..
+    /**
+     * @fn  void ATwitchAuthActor::StartUserSignIn();
+     *
+     * @brief   Start the sign in process with web browser if the user is not yet authenticated..
+     */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     void StartUserSignIn();
 
-    // Returns a struct of the signed in Twitch user.
+    /**
+     * @fn  FTwitchUser ATwitchAuthActor::GetSignedInTwitchUser();
+     *
+     * @brief   Returns a struct of the signed in Twitch user.
+     *
+     * @return  The signed in twitch user.
+     */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     FTwitchUser GetSignedInTwitchUser();
 
-    // Starts a checking process if a given Twitch user is a subscriber to a given channel.
-    // This function will trigger the OnTwitchUserSubscribedToChannel event.
+    /**
+     * @fn  void ATwitchAuthActor::IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, FString ChannelName);
+     *
+     * @brief   Starts a checking process if a given Twitch user is a subscriber to a given channel.
+     *          This function will trigger the OnTwitchUserSubscribedToChannel event.
+     *
+     * @param   TwitchUser  The twitch user.
+     * @param   ChannelName Name of the channel.
+     */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     void IsTwitchUserSubscribedToChannel(FTwitchUser TwitchUser, FString ChannelName);
 
-    // Returns the retrieved access token from the sign in process.
+    /**
+     * @fn  FString ATwitchAuthActor::GetAccessToken();
+     *
+     * @brief   Returns the retrieved access token from the sign in process.
+     *
+     * @return  The access token.
+     */
     UFUNCTION(BlueprintPure, Category = "Twitch Auth")
     FString GetAccessToken();
     
-    // Sets the access token if it has been saved to disk.
+    /**
+     * @fn  void ATwitchAuthActor::SetAccessToken(FString AccessToken);
+     *
+     * @brief   Sets the access token if it has been saved to disk.
+     *
+     * @param   AccessToken The access token.
+     */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     void SetAccessToken(FString AccessToken);
 
-    // Clears the access token.
+    /**
+    * @fn  void ATwitchAuthActor::ClearAccessToken();
+    *
+    * @brief   Clears the access token
+    */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
     void ClearAccessToken();
 
-    // Returns the last written error.
+    /**
+     * @fn  FError ATwitchAuthActor::GetLastError();
+     *
+     * @brief   Returns the last written error.
+     *
+     * @return  The last error.
+     */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth")
-    FError GetLastError();
+    FTwitchError GetLastError();
 
 protected:
 
@@ -210,196 +289,250 @@ protected:
 
     #pragma region Blueprint Interaction
 
-    /// <summary>
-    /// This is always the last error message from within the current state of the actor.
-    /// </summary>
-    FError m_LastError;
+    /** @brief   This is always the last error message from within the current state of the actor. */
+    FTwitchError m_LastError;
     
-    /// <summary>
-    /// Access token that has been received from the Twitch sign in.
-    /// </summary>
+    /** @brief   Access token that has been received from the Twitch sign in. */
     FString m_AccessToken;
+
+    /**
+     * @fn  void ATwitchAuthActor::LogError(const FTwitchError& twitchError);
+     *
+     * @brief   Logs an error.
+     *
+     * @param   twitchError The twitch error.
+     */
+    void LogError(const FTwitchError& twitchError);
 
     #pragma endregion // Blueprint Interaction
 
-private:
-
     #pragma region HTTP API
 
-    /// <summary>
-    /// HTTP module reference.
-    /// </summary>
-	FHttpModule* m_Http;
+    /** @brief   HTTP module reference. */
+    FHttpModule* m_Http;
 
-    /// <summary>
-    /// Creates a HTTP request.
-    /// </summary>
-    /// <param name="Endpoint">Endpoint the request should connect to.</param>
-    /// <param name="Verb">HTTP Verb that the request should use.</param>
-    /// <returns>Created HTTP request reference.</returns>
+    /**
+    * @fn  TSharedRef<IHttpRequest> ATwitchAuthActor::CreateHttpRequest(FString Endpoint, EHttpVerb Verb);
+    *
+    * @brief   Creates a HTTP request.
+    *
+    * @param   Endpoint    Endpoint the request should connect to.
+    * @param   Verb        HTTP Verb that the request should use.
+    *
+    * @return  Created HTTP request reference.
+    */
     TSharedRef<IHttpRequest> CreateHttpRequest(FString Endpoint, EHttpVerb Verb);
 
-    /// <summary>
-    /// Returns a HTTP verb string based on a given HTTP verb enum.
-    /// </summary>
-    /// <param name="Verb">HTTP verb enum value.</param>
-    /// <returns>HTTP verb string.</returns>
+    /**
+    * @fn  FString ATwitchAuthActor::GetHttpVerbStr(EHttpVerb Verb);
+    *
+    * @brief   Returns a HTTP verb string based on a given HTTP verb enum.
+    *
+    * @param   Verb    HTTP verb enum value.
+    *
+    * @return  HTTP verb string.
+    */
     FString GetHttpVerbStr(EHttpVerb Verb);
-	
-    /// <summary>
-    /// Checks if a given response is valid.
-    /// </summary>
-    /// <param name="Response">Response to check.</param>
-    /// <param name="bWasSuccessful">Flag, wheter the request went fully through.</param>
-    /// <returns>Flag, wheter the response is valid or not.</returns>
+
+    /**
+    * @fn  bool ATwitchAuthActor::IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful);
+    *
+    * @brief   Checks if a given response is valid.
+    *
+    * @param   Response        Response to check.
+    * @param   bWasSuccessful  Flag, whether the request went fully through.
+    *
+    * @return  Flag, whether the response is valid or not.
+    */
     bool IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful);
 
-    /// <summary>
-    /// Common callback function for any HTTP requests made.
-    /// </summary>
-    /// <param name="Request">HTTP request that generated this response.</param>
-    /// <param name="Response">HTTP Response from the requested server.</param>
-    /// <param name="bWasSuccessful">Flag, wheter or not the request went through successfully.</param>
+    /**
+    * @fn  void ATwitchAuthActor::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+    *
+    * @brief   Common callback function for any HTTP requests made.
+    *
+    * @param   Request         HTTP request that generated this response.
+    * @param   Response        HTTP Response from the requested server.
+    * @param   bWasSuccessful  Flag, whether or not the request went through successfully.
+    */
     void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-    
+
     #pragma endregion // HTTP API
+
+private:
 
     #pragma region Web Browser Widget
 
-    /// <summary>
-    /// Access token key definition which is used to cut out the access token from the redirect URI.
-    /// </summary>
+    /**
+     * @brief   Access token key definition which is used to cut out the access token from the
+     *          redirect URI.
+     */
     FString AccessTokenKey = "access_token=";
 
-    /// <summary>
-    /// Access token URI string to check if a given URI is the correct one.
-    /// </summary>
+    /** @brief   Access token URI string to check if a given URI is the correct one. */
     FString AccessTokenUriContainsStr = "https://localhost/#access_token";
 
-    /// <summary>
-    /// Shared pointer to the created container widget which contains the web browser widget.
-    /// </summary>
+    /** @brief   Shared pointer to the created container widget which contains the web browser widget. */
     TSharedPtr<SWidget> WeakWidget;
 
-    /// <summary>
-    /// Shared pointer to the created browser widget.
-    /// </summary>
+    /** @brief   Shared pointer to the created browser widget. */
     TSharedPtr<class SWebBrowser> WebBrowserWidget;
 
-    /// <summary>
-    /// Returns the sign in URL from Twitch services.
-    /// </summary>
-    /// <returns>URL for the sign in page.</returns>
+    /**
+     * @fn  void ATwitchAuthActor::EnableCursor(bool bEnable);
+     *
+     * @brief   Enables the cursor.
+     *
+     * @param   bEnable True to enable, false to disable.
+     */
+    void EnableCursor(bool bEnable);
+
+    /**
+     * @fn  FString ATwitchAuthActor::GetTwitchSigninUrl();
+     *
+     * @brief   Returns the sign in URL from Twitch services.
+     *
+     * @return  URL for the sign in page.
+     */
     FString GetTwitchSigninUrl();
 
-    /// <summary>
-    /// Retrieves the access token from the redirect URI that is generated after the sign in process.
-    /// </summary>
-    /// <param name="RedirectUri">Redirect URI.</param>
-    /// <returns>Cutted access token sub-string.</returns>
+    /**
+     * @fn  FString ATwitchAuthActor::GetAccessToken(const FString& RedirectUri);
+     *
+     * @brief   Retrieves the access token from the redirect URI that is generated after the sign in
+     *          process.
+     *
+     * @param   RedirectUri Redirect URI.
+     *
+     * @return  Cutted access token sub-string.
+     */
     FString GetAccessToken(const FString& RedirectUri);
 
-    /// <summary>
-    /// Creates the web browser widget.
-    /// </summary>
-    /// <returns>Created web browser widget.</returns>
+    /**
+     * @fn  TSharedPtr<SWidget> ATwitchAuthActor::CreateWebBrowserWidget();
+     *
+     * @brief   Creates the web browser widget.
+     *
+     * @return  Created web browser widget.
+     */
     TSharedPtr<SWidget> CreateWebBrowserWidget();
 
-    /// <summary>
-    /// Adds a given widget to the viewport.
-    /// </summary>
-    /// <param name="Widget">Widget to add to the viewport.</param>
+    /**
+     * @fn  void ATwitchAuthActor::AddWidgetToViewport(TSharedPtr<SWidget> Widget);
+     *
+     * @brief   Adds a given widget to the viewport.
+     *
+     * @param   Widget  Widget to add to the viewport.
+     */
     void AddWidgetToViewport(TSharedPtr<SWidget> Widget);
 
-    /// <summary>
-    /// Removes a given widget from the viewport, given that it is currently in the viewport.
-    /// </summary>
-    /// <param name="Widget">Widget to remove from the viewport.</param>
+    /**
+     * @fn  void ATwitchAuthActor::RemoveWidgetFromViewport(TSharedPtr<SWidget> Widget);
+     *
+     * @brief   Removes a given widget from the viewport, given that it is currently in the viewport.
+     *
+     * @param   Widget  Widget to remove from the viewport.
+     */
     void RemoveWidgetFromViewport(TSharedPtr<SWidget> Widget);
 
-    /// <summary>
-    /// Handler method which is called by the web browser when the URL changes.
-    /// </summary>
-    /// <param name="InText">New URL.</param>
+    /**
+     * @fn  void ATwitchAuthActor::HandleOnUrlChanged(const FText& InText);
+     *
+     * @brief   Handler method which is called by the web browser when the URL changes.
+     *
+     * @param   InText  New URL.
+     */
     void HandleOnUrlChanged(const FText& InText);
     
     #pragma endregion // Web Browser Widget
 
     #pragma region Twitch API Endpoints
 
-    /// <summary>
-    /// Base API URL.
-    /// </summary>
+    /** @brief   Base API URL. */
     FString m_ApiBaseUrl = "https://api.twitch.tv/kraken";
 
-    /// <summary>
-    /// Twitch API Endpoints.
-    /// </summary>
+    /** @brief   Twitch API Endpoints. */
     FString m_UserEndpoint = "/user";
     FString m_ChannelEndpoint = "/users?login=";
     FString m_SubscriptionEndpoint = "/users/$1/subscriptions/$2";
 
-    /// <summary>
-    /// Keeps track of what endpoint was last requested to.
-    /// </summary>
+    /** @brief   Keeps track of what endpoint was last requested to. */
     EEndpoint m_LastEndpoint = EEndpoint::None;
 
-    /// <summary>
-    /// Signed in Twitch user from the browser module.
-    /// </summary>
+    /** @brief   Signed in Twitch user from the browser module. */
     FTwitchUser m_TwitchUser;
 
-    /// <summary>
-    /// Twitch channel user from the GetTwitchChannel request.
-    /// </summary>
+    /** @brief   Twitch channel user from the GetTwitchChannel request. */
     FTwitchChannelUser m_TwitchChannelUser;
 
-    /// <summary>
-    /// Twitch subscription from the CheckUserSubcription request.
-    /// </summary>
+    /** @brief   Twitch subscription from the CheckUserSubcription request. */
     FTwitchSubscription m_TwitchSubscription;
 
-    /// <summary>
-    /// Pulls out the JSON from the channel request.
-    /// </summary>
-    /// <param name="ResponseBody">JSON response body from the request.</param>
-    /// <returns>Cleared JSON.</returns>
+    /**
+     * @fn  FString ATwitchAuthActor::RetrieveTwitchChannelUserFromResponseBody(const FString& ResponseBody) const;
+     *
+     * @brief   Pulls out the JSON from the channel request.
+     *
+     * @param   ResponseBody    JSON response body from the request.
+     *
+     * @return  Cleared JSON.
+     */
     FString RetrieveTwitchChannelUserFromResponseBody(const FString& ResponseBody) const;
 
-    /// <summary>
-    /// Executes the GET /user endpoint request.
-    /// </summary>
+    /**
+     * @fn  void ATwitchAuthActor::ExecuteGetTwitchUserRequest();
+     *
+     * @brief   Executes the GET /user endpoint request.
+     */
     void ExecuteGetTwitchUserRequest();
 
-    /// <summary>
-    /// Handles the GET /user endpoint response.
-    /// </summary>
-    /// <param name="Request">Request made.</param>
-    /// <param name="Response">Returned response.</param>
+    /**
+     * @fn  void ATwitchAuthActor::HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+     *
+     * @brief   Handles the GET /user endpoint response.
+     *
+     * @param   Request     Request made.
+     * @param   Response    Returned response.
+     */
     void HandleGetTwitchUserResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
 
-    /// <summary>
-    /// Executes the GET /user endpoint request.
-    /// </summary>
+    /**
+     * @fn  void ATwitchAuthActor::ExecuteGetTwitchChannelRequest(FString ChannelName);
+     *
+     * @brief   Executes the GET /user endpoint request.
+     *
+     * @param   ChannelName Name of the channel.
+     */
     void ExecuteGetTwitchChannelRequest(FString ChannelName);
 
-    /// <summary>
-    /// Handles the GET /user endpoint response.
-    /// </summary>
-    /// <param name="Request">Request made.</param>
-    /// <param name="Response">Returned response.</param>
+    /**
+     * @fn  void ATwitchAuthActor::HandleGetTwitchChannelResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+     *
+     * @brief   Handles the GET /user endpoint response.
+     *
+     * @param   Request     Request made.
+     * @param   Response    Returned response.
+     */
     void HandleGetTwitchChannelResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
 
-    /// <summary>
-    /// Executes the GET /user endpoint request.
-    /// </summary>
+    /**
+     * @fn  void ATwitchAuthActor::ExecuteCheckUserSubscriptionRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel);
+     *
+     * @brief   Executes the GET /user endpoint request.
+     *
+     * @param   TwitchUser      The twitch user.
+     * @param   TwitchChannel   The twitch channel.
+     */
     void ExecuteCheckUserSubscriptionRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel);
 
-    /// <summary>
-    /// Handles the GET /user endpoint response.
-    /// </summary>
-    /// <param name="Request">Request made.</param>
-    /// <param name="Response">Returned response.</param>
+    /**
+     * @fn  void ATwitchAuthActor::HandleCheckUserSubscriptionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+     *
+     * @brief   Handles the GET /user endpoint response.
+     *
+     * @param   Request     Request made.
+     * @param   Response    Returned response.
+     */
     void HandleCheckUserSubscriptionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
 
     #pragma endregion // Twitch API Endpoints
