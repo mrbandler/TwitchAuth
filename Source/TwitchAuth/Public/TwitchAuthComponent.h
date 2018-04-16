@@ -76,7 +76,7 @@ public:
      *
      * @return  The authenticated Twitch user.
      */
-    UFUNCTION(BlueprintPure, Category = "Twitch Auth", meta (ToolTip = "Returns the authenticated Twitch user."))
+    UFUNCTION(BlueprintPure, Category = "Twitch Auth", meta = (ToolTip = "Returns the authenticated Twitch user."))
     FTwitchUser GetUser() const;
 
     /**
@@ -127,6 +127,16 @@ public:
     UFUNCTION(BlueprintPure, Category = "Twitch Auth", meta = (ToolTip = "Returns the last error."))
     FTwitchError GetLastError() const;
 
+    /**
+     * @fn  UWebBrowser* UTwitchAuthComponent::GetWebBrowser() const;
+     *
+     * @brief   Returns the used web browser.
+     *
+     * @return  Null if it fails, else the web browser.
+     */
+    UFUNCTION(BlueprintPure, Category = "Twitch Auth", meta = (ToolTip = "Returns the used web browser."))
+    UWebBrowser* GetWebBrowser() const;
+
 protected:
 
     #pragma region Blueprint Interaction
@@ -163,10 +173,12 @@ protected:
 
     #pragma endregion // HTTP API;
 
-public:	
+private:
 
     #pragma region Web Browser Widget
 
+    /** @brief   The web browser that is used to display the authentication pages. */
+    UWebBrowser* m_WebBrowser;
 
     /**
      * @fn  void UTwitchAuthComponent::HandleOnUrlChanged(const FText& InText);

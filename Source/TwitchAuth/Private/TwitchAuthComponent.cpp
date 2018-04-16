@@ -35,9 +35,10 @@ void UTwitchAuthComponent::Authenticate(UWebBrowser* WebBrowser)
     {
         if(WebBrowser)
         {
+            m_WebBrowser = WebBrowser;
             FString url = UTwitchHttpApi::GetAuthenticationUrl(ClientId, bForceVerify);
-            WebBrowser->OnUrlChanged.AddDynamic(this, &UTwitchAuthComponent::HandleOnUrlChanged);
-            WebBrowser->LoadURL(url);
+            m_WebBrowser->OnUrlChanged.AddDynamic(this, &UTwitchAuthComponent::HandleOnUrlChanged);
+            m_WebBrowser->LoadURL(url);
         }
         else
         {
@@ -75,6 +76,11 @@ void UTwitchAuthComponent::ClearAccessToken()
 FTwitchError UTwitchAuthComponent::GetLastError() const
 {
     return m_LastError;
+}
+
+UWebBrowser* UTwitchAuthComponent::GetWebBrowser() const
+{
+    return m_WebBrowser;
 }
 
 #pragma endregion // Blueprint Interaction
