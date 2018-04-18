@@ -1,9 +1,9 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
+	"VersionName": "1.0.0",
 	"FriendlyName": "TwitchAuth",
-	"Description": "This plugin let's your players sign into Twitch from within your game.",
+	"Description": "This plugin let's your players sign into Twitch from within your game to check if they are subscribers.",
 	"Category": "Blueprints",
 	"CreatedBy": "fivefingergames",
 	"CreatedByURL": "https://fivefingergames.com",
@@ -11,13 +11,23 @@
 	"MarketplaceURL": "",
 	"SupportURL": "support@fivefingergames.com",
 	"CanContainContent": true,
-	"IsBetaVersion": true,
+	"IsBetaVersion": false,
 	"Installed": false,
 	"Modules": [
 		{
 			"Name": "TwitchAuth",
 			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
+			"LoadingPhase": "PreLoadingScreen",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "WebBrowserWidget",
+			"Enabled": true
 		}
 	]
 }

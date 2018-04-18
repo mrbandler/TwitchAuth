@@ -1,0 +1,1 @@
+RunUAT.bat BuildPlugin -Plugin="%CD%\TwitchAuth.uplugin" -Package="%CD%\Build\TwitchAuth" -Rocket
