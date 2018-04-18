@@ -53,7 +53,7 @@ Please open a issue when you encounter any bugs 🐞 or have an idea for a new f
 
 If you like you can buy me a coffee:
 
-[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](paypal.me/mrbandler)
+[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/mrbandler/)
 
 ![Support via Bitcoin](https://cdn.rawgit.com/cjdowner/cryptocurrency-icons/master/svg/color/btc.svg) `3LqohnMDLdn2VtKChQMGJ7pQt8az2Zyqn4`
 
