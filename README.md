@@ -6,12 +6,12 @@
 
 ## Table Of Content
 
-1. [Idea and Use Case](#idea-and-use-case) 🤔
-2. [Installation](#installation) 💻
-3. [Usage](#usage) ⌨️
-4. [Bugs and Features](#bugs-and-features) 🐞💡
-5. [Buy me a coffee](#buy-me-a-coffee) ☕
-6. [License](#license) 📃
+1. [Idea and Use Case](#1-idea-and-use-case) 🤔
+2. [Installation](#2-installation) 💻
+3. [Usage](#3-usage) ⌨️
+4. [Bugs and Features](#4-bugs-and-features) 🐞💡
+5. [Buy me a coffee](#5-buy-me-a-coffee) ☕
+6. [License](#6-license) 📃
 
 ---
 
@@ -24,6 +24,8 @@ I saw some flaws in this approach, because now you had to rely on the subscriber
 ----
 
 ## 2. Installation
+
+> **The marketplace version is currently under approval. I'll add the link once it is approved.**
 
 To install the plugin simply download it over the [Unreal Engine Marketplace](https://www.unrealengine.com/marketplace). Click [here]() to download.
 
@@ -53,7 +55,7 @@ Please open a issue when you encounter any bugs 🐞 or have an idea for a new f
 
 If you like you can buy me a coffee:
 
-[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](paypal.me/mrbandler)
+[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/mrbandler/)
 
 ![Support via Bitcoin](https://cdn.rawgit.com/cjdowner/cryptocurrency-icons/master/svg/color/btc.svg) `3LqohnMDLdn2VtKChQMGJ7pQt8az2Zyqn4`
 
