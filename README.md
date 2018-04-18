@@ -1,8 +1,8 @@
 # Twitch Auth
 
-TODO: Insert images here.
-
 **This is a Unreal Engine 4 plugin for In-Game Twitch Authentication.**
+
+![TwitchAuth](https://github.com/mrbandler/TwitchAuth/raw/master/Images/%231.png)
 
 ## Table Of Content
 
