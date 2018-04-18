@@ -6,12 +6,12 @@
 
 ## Table Of Content
 
-1. [Idea and Use Case](#idea-and-use-case) 🤔
-2. [Installation](#installation) 💻
-3. [Usage](#usage) ⌨️
-4. [Bugs and Features](#bugs-and-features) 🐞💡
-5. [Buy me a coffee](#buy-me-a-coffee) ☕
-6. [License](#license) 📃
+1. [Idea and Use Case](#1-idea-and-use-case) 🤔
+2. [Installation](#2-installation) 💻
+3. [Usage](#3-usage) ⌨️
+4. [Bugs and Features](#4-bugs-and-features) 🐞💡
+5. [Buy me a coffee](#5-buy-me-a-coffee) ☕
+6. [License](#6-license) 📃
 
 ---
 
