@@ -19,7 +19,7 @@
 
 The idea for this plugin came while watching the development stream from a fellow Twitch streamer called [Wheeze202](https://www.twitch.tv/wheeze202). He provides his Twitch subscribers early development builds of his current project [Galdur](https://galdurgame.com/) to playtest and give him feedback on. His infrastructure was simple, he simply whispered the link to the build when a subscriber entered a command in the Twitch chat.
 
-I saw some flaws in this approach, because now you had to rely on the subscriber to keep the link a secret. I though there must be a better way. So, I set out to build this plugin to let any Twitch game developer have the ability to let potential subscriber play testers authenticate in-game. Now only subscribers to your channel can play the 
+I saw some flaws in this approach, because now you had to rely on the subscriber to keep the link a secret. I though there must be a better way. So, I set out to build this plugin to let any Twitch game developer have the ability to let potential subscriber play testers authenticate in-game. Now only subscribers to your channel can play the game.
 
 ----
 
@@ -35,7 +35,7 @@ Download the plugin via the releases tab, unzip the archive and drop the unzippe
 
 Or install it engine wide in the ``<folder_to_your_ue4_installation/UE_4.19/Engine/Plugins``. If you didn't change the installation directory of your UE4 installation the folder should be under ``C:\Program Files\Epic Games\UE_4.19\Engine\Plugins``.
 
-> **NOTE:** This project is dependent on the *WebBrowserWidget* plugin please enable it under plugins menu within the UE4 Editor.
+> **NOTE:** A detailed guide for both manual installation types can be found in the [wiki](https://github.com/mrbandler/TwitchAuth/wiki).
 
 ---
 
