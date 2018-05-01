@@ -1,4 +1,4 @@
-// Some copyright should be here...
+// Copyright (c) 2018 fivefingergames.
 
 using UnrealBuildTool;
 
