@@ -25,9 +25,7 @@ I saw some flaws in this approach, because now you had to rely on the subscriber
 
 ## 2. Installation
 
-> **The marketplace version is currently under approval. I'll add the link once it is approved.**
-
-To install the plugin simply download it over the [Unreal Engine Marketplace](https://www.unrealengine.com/marketplace). Click [here]() to download.
+To install the plugin simply download it over the [Unreal Engine Marketplace](https://www.unrealengine.com/marketplace). Click [here](https://www.unrealengine.com/marketplace/twitch-auth) to download.
 
 **The alternative:**
 
