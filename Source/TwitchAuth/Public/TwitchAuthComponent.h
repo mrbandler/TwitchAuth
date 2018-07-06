@@ -10,6 +10,8 @@
 #include "Private/TwitchHttpApi.h"
 #include "TwitchAuthComponent.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogTwitchAuth, Log, All);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAuthenticationPageLoaded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAccessTokenPageLoaded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthenticated, bool, bAuthenticated);

@@ -1,15 +1,19 @@
 // Copyright (c) 2018 fivefingergames.
 
 #include "TwitchAuthComponent.h"
-#include "CoreMinimal.h"
 #include "Engine.h"
-#include "Kismet/GameplayStatics.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
+#include "CoreMinimal.h"
 #include "Json.h"
 #include "JsonUtilities.h"
 #include "WebBrowser.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
+#include "Kismet/GameplayStatics.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
 #include "Private/TwitchHttpApi.h"
 #include "TwitchAuthTypes.h"
+
+DEFINE_LOG_CATEGORY(LogTwitchAuth);
 
 UTwitchAuthComponent::UTwitchAuthComponent()
 {
@@ -99,7 +103,7 @@ UWebBrowser* UTwitchAuthComponent::GetWebBrowser() const
 void UTwitchAuthComponent::LogError(const FTwitchError& twitchError) const
 {
     FString logMessage = twitchError.error + "(" + FString::FromInt(twitchError.status) + "): " + twitchError.message;
-    UE_LOG(LogTemp, Warning, TEXT("%s"), *logMessage);
+    UE_LOG(LogTwitchAuth, Error, TEXT("%s"), *logMessage);
 }
 
 #pragma endregion // Protected
