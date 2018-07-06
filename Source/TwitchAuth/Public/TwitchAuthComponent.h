@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "TwitchAuthTypes.h"
-#include "WebBrowser.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
+#include "WebBrowser.h"
+#include "TwitchAuthTypes.h"
 #include "Private/TwitchHttpApi.h"
 #include "TwitchAuthComponent.generated.h"
 
@@ -14,8 +14,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAuthenticationPageLoaded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAccessTokenPageLoaded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUserAuthenticated, bool, bAuthenticated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUserSubscribedToChannel, bool, bSubscribed, FTwitchSubscription, TwitchSubscription);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUserFollowingChannel, bool, bSubscribed, FTwitchFollow, TwitchFollow);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 /**
  * @class   TWITCHAUTH_API TwitchAuthComponent.h
  *          D:\Projects\fivefingergames\FFGPlugins\Plugins\TwitchAuth\Source\TwitchAuth\Public\TwitchAuthComponent.h
@@ -24,16 +25,16 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
  */
 class TWITCHAUTH_API UTwitchAuthComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
+public:
 
     /**
      * @fn  UTwitchAuthComponent::UTwitchAuthComponent();
      *
      * @brief   Default constructor.
      */
-	UTwitchAuthComponent();
+    UTwitchAuthComponent();
 
     /** Client ID from your Twitch application. */
     UPROPERTY(EditDefaultsOnly, Category = "Twitch Auth")
@@ -51,12 +52,16 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "Twitch Auth|Events")
     FOnUserSubscribedToChannel OnUserSubscribedToChannel;
 
+    /** Will be fired when the following verification process finishes. */
+    UPROPERTY(BlueprintAssignable, Category = "Twitch Auth|Events")
+    FOnUserFollowingChannel OnUserFollowingChannel;
+
     /** Will be fired when the authentication page has finished loading in the given browser. */
     UPROPERTY(BlueprintAssignable, Category = "Twitch Auth|Events")
     FOnAuthenticationPageLoaded OnAuthenticationPageLoaded;
 
-    UPROPERTY(BlueprintAssignable, Category = "Twitch Auth|Events")
     /** Will be fired when the access token page has finished loading in the given browser. */
+    UPROPERTY(BlueprintAssignable, Category = "Twitch Auth|Events")
     FOnAccessTokenPageLoaded OnAccessTokenPageLoaded;
 
     /**
@@ -88,6 +93,16 @@ public:
      */
     UFUNCTION(BlueprintCallable, Category = "Twitch Auth", meta = (ToolTip = "Check if the authenticated Twitch user is subscribed to a given channel."))
     void IsUserSubscribedToChannel(const FString& ChannelName);
+
+    /**
+     * @fn  void UTwitchAuthComponent::IsUserFollowingChannel(const FString& ChannelName);
+     *
+     * @brief   Check if the authenticated Twitch user is following a given channel.
+     *
+     * @param   ChannelName Name of the channel.
+     */
+    UFUNCTION(BlueprintCallable, Category = "Twitch Auth", meta = (ToolTip = "Check if the authenticated Twitch user is following a given channel."))
+    void IsUserFollowingChannel(const FString& ChannelName);
 
     /**
      * @fn  FString UTwitchAuthComponent::GetAccessToken() const;
@@ -194,6 +209,9 @@ private:
 
     #pragma region Twitch API Endpoints
 
+    /** The Twitch request that is currently carried out. */
+    ETwitchRequest m_TwitchRequest = ETwitchRequest::None;
+
     /** The last endpoint a request was send to. */
     EEndpoint m_LastEndpoint = EEndpoint::None;
 
@@ -205,6 +223,9 @@ private:
 
     /** The Twitch subscription from the IsUserSubscribedToChannel process. */
     FTwitchSubscription m_TwitchSubscription;
+
+    /** The Twitch follow from the IsUserFollowingChannel process. */
+    FTwitchFollow m_TwitchFollow;
 
     /**
      * @fn  void UTwitchAuthComponent::ExecuteGetUserRequest();
@@ -261,6 +282,26 @@ private:
      * @param   Response    The response.
      */
     void HandleCheckUserSubscriptionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+
+    /**
+     * @fn  void UTwitchAuthComponent::ExecuteCheckUserFollowingRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel);
+     *
+     * @brief   Executes the check user following request operation
+     *
+     * @param   TwitchUser      The twitch user.
+     * @param   TwitchChannel   The twitch channel.
+     */
+    void ExecuteCheckUserFollowingRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel);
+
+    /**
+     * @fn  void UTwitchAuthComponent::HandleCheckUserFollowingResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+     *
+     * @brief   Handles the check user following response
+     *
+     * @param   Request     The request.
+     * @param   Response    The response.
+     */
+    void HandleCheckUserFollowingResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
 
     #pragma endregion // Twitch API Endpoints
 

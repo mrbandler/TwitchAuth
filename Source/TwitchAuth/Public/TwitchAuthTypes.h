@@ -12,8 +12,8 @@ struct TWITCHAUTH_API FTwitchUserNotifications
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) bool push;
-    UPROPERTY(BlueprintReadOnly) bool email;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool push;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool email;
 
     FTwitchUserNotifications() {}
 };
@@ -26,14 +26,14 @@ struct TWITCHAUTH_API FTwitchChannelUser
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) FString display_name;
-    UPROPERTY(BlueprintReadOnly) FString _id;
-    UPROPERTY(BlueprintReadOnly) FString name;
-    UPROPERTY(BlueprintReadOnly) FString type;
-    UPROPERTY(BlueprintReadOnly) FString bio;
-    UPROPERTY(BlueprintReadOnly) FString created_at;
-    UPROPERTY(BlueprintReadOnly) FString updated_at;
-    UPROPERTY(BlueprintReadOnly) FString logo;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString display_name;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString _id;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString name;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString type;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString bio;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString created_at;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString updated_at;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString logo;
 
     FTwitchChannelUser() {}
 };
@@ -46,11 +46,11 @@ struct TWITCHAUTH_API FTwitchUser : public FTwitchChannelUser
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) FString email;
-    UPROPERTY(BlueprintReadOnly) bool email_verified;
-    UPROPERTY(BlueprintReadOnly) bool partnered;
-    UPROPERTY(BlueprintReadOnly) bool twitter_connected;
-    UPROPERTY(BlueprintReadOnly) FTwitchUserNotifications notifications;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString email;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool email_verified;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool partnered;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool twitter_connected;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FTwitchUserNotifications notifications;
 
     FTwitchUser() {}
 };
@@ -63,23 +63,23 @@ struct TWITCHAUTH_API FTwitchChannel
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) bool mature;
-    UPROPERTY(BlueprintReadOnly) FString status;
-    UPROPERTY(BlueprintReadOnly) FString broadcaster_language;
-    UPROPERTY(BlueprintReadOnly) FString game;
-    UPROPERTY(BlueprintReadOnly) FString language;
-    UPROPERTY(BlueprintReadOnly) FString name;
-    UPROPERTY(BlueprintReadOnly) FString created_at;
-    UPROPERTY(BlueprintReadOnly) FString updated_at;
-    UPROPERTY(BlueprintReadOnly) FString _id;
-    UPROPERTY(BlueprintReadOnly) FString logo;
-    UPROPERTY(BlueprintReadOnly) FString video_banner;
-    UPROPERTY(BlueprintReadOnly) FString profile_banner;
-    UPROPERTY(BlueprintReadOnly) FString profile_banner_background_color;
-    UPROPERTY(BlueprintReadOnly) bool partner;
-    UPROPERTY(BlueprintReadOnly) FString url;
-    UPROPERTY(BlueprintReadOnly) int32 views;
-    UPROPERTY(BlueprintReadOnly) int32 followers;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool mature;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString status;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString broadcaster_language;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString game;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString language;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString name;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString created_at;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString updated_at;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString _id;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString logo;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString video_banner;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString profile_banner;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString profile_banner_background_color;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool partner;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString url;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") int32 views;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") int32 followers;
 
     FTwitchChannel() {}
 };
@@ -92,14 +92,29 @@ struct TWITCHAUTH_API FTwitchSubscription
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) FString created_at;
-    UPROPERTY(BlueprintReadOnly) FString _id;
-    UPROPERTY(BlueprintReadOnly) FString sub_plan;
-    UPROPERTY(BlueprintReadOnly) FString sub_plan_name;
-    UPROPERTY(BlueprintReadOnly) bool is_gift;
-    UPROPERTY(BlueprintReadOnly) FTwitchChannel channel;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString created_at;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString _id;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString sub_plan;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString sub_plan_name;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool is_gift;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FTwitchChannel channel;
 
     FTwitchSubscription() {}
+};
+
+/**
+* Twitch follow.
+*/
+USTRUCT(BlueprintType)
+struct TWITCHAUTH_API FTwitchFollow
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString created_at;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") bool notifications;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FTwitchChannel channel;
+
+    FTwitchFollow() {}
 };
 
 /**
@@ -110,9 +125,9 @@ struct TWITCHAUTH_API FTwitchError
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly) FString error;
-    UPROPERTY(BlueprintReadOnly) int32 status;
-    UPROPERTY(BlueprintReadOnly) FString message;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString error;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") int32 status;
+    UPROPERTY(BlueprintReadOnly, Category = "Twitch Auth") FString message;
 
     FTwitchError() {}
 };

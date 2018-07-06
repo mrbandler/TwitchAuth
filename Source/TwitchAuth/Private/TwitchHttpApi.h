@@ -7,7 +7,6 @@
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "TwitchHttpApi.generated.h"
 
-
 /**
  * @enum    EHttpVerb
  *
@@ -23,7 +22,6 @@ enum class EHttpVerb : uint8
     Delete
 };
 
-
 /**
  * @enum    EEndpoint
  *
@@ -35,9 +33,22 @@ enum class EEndpoint : uint8
     None,
     User,
     Channels,
-    Subscriptions
+    Subscriptions,
+    Following
 };
 
+/**
+* @enum    ETwitchRequest
+*
+* @brief   Values that represent different request that can be made to the Twitch API.
+*/
+UENUM()
+enum class ETwitchRequest : uint8
+{
+    None,
+    Subscription,
+    Following
+};
 
 /**
  * @class   UTwitchHttpApi TwitchHttpApi.h
@@ -70,6 +81,9 @@ public:
 
     /** @brief   The Twitch subscription API endpoint */
     static const FString SUBSCRIPTION_ENDPOINT;
+
+    /** @brief   The Twitch following API endpoint */
+    static const FString FOLLOWING_ENDPOINT;
 
     /**
      * @fn  static FString UTwitchHttpApi::ExtractTwitchChannelUserFromResponseBody(const FString& ResponseBody);

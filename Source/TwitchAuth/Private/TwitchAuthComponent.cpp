@@ -55,6 +55,13 @@ void UTwitchAuthComponent::Authenticate(UWebBrowser* WebBrowser)
 
 void UTwitchAuthComponent::IsUserSubscribedToChannel(const FString& ChannelName)
 {
+    m_TwitchRequest = ETwitchRequest::Subscription;
+    ExecuteGetChannelRequest(ChannelName);
+}
+
+void UTwitchAuthComponent::IsUserFollowingChannel(const FString& ChannelName)
+{
+    m_TwitchRequest = ETwitchRequest::Following;
     ExecuteGetChannelRequest(ChannelName);
 }
 
@@ -146,6 +153,12 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
                 HandleCheckUserSubscriptionResponse(Request, Response);
                 break;
 
+            case EEndpoint::Following:
+                m_LastEndpoint = EEndpoint::None;
+
+                HandleCheckUserFollowingResponse(Request, Response);
+                break;
+
             default:
                 break;
         }
@@ -157,6 +170,11 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
 
         switch(m_LastEndpoint)
         {
+            case EEndpoint::Following:
+                LogError(m_LastError);
+                OnUserFollowingChannel.Broadcast(false, m_TwitchFollow);
+                break;
+
             case EEndpoint::Subscriptions:
                 LogError(m_LastError);
                 OnUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
@@ -228,7 +246,15 @@ void UTwitchAuthComponent::HandleGetChannelResponse(FHttpRequestPtr Request, FHt
     // And convert the body to a struct.
     if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchChannelUser>(responseBody, &m_TwitchChannelUser, 0, 0) == true)
     {
-        ExecuteCheckUserSubscriptionRequest(m_TwitchUser, m_TwitchChannelUser);
+        switch(m_TwitchRequest)
+        {
+            case ETwitchRequest::Subscription: ExecuteCheckUserSubscriptionRequest(m_TwitchUser, m_TwitchChannelUser);
+                break;
+            case ETwitchRequest::Following: ExecuteCheckUserFollowingRequest(m_TwitchUser, m_TwitchChannelUser);
+                break;
+        }
+
+        m_TwitchRequest = ETwitchRequest::None;
     }
     else
     {
@@ -266,6 +292,31 @@ void UTwitchAuthComponent::HandleCheckUserSubscriptionResponse(FHttpRequestPtr R
     if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchSubscription>(responseBody, &m_TwitchSubscription, 0, 0) == true)
     {
         OnUserSubscribedToChannel.Broadcast(true, m_TwitchSubscription);
+    }
+}
+
+void UTwitchAuthComponent::ExecuteCheckUserFollowingRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel)
+{
+    FString endpoint = UTwitchHttpApi::FOLLOWING_ENDPOINT;
+    endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
+    endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
+
+    TSharedRef<IHttpRequest> request = UTwitchHttpApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
+
+    m_LastEndpoint = EEndpoint::Following;
+
+    request->ProcessRequest();
+}
+
+void UTwitchAuthComponent::HandleCheckUserFollowingResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
+{
+    const FString responseBody = Response->GetContentAsString();
+
+    // And convert the body to a struct.
+    if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchFollow>(responseBody, &m_TwitchFollow, 0, 0) == true)
+    {
+        OnUserFollowingChannel.Broadcast(true, m_TwitchFollow);
     }
 }
 
