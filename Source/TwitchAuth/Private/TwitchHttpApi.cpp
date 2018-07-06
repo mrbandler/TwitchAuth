@@ -6,11 +6,12 @@ FHttpModule* UTwitchHttpApi::Http = &FHttpModule::Get();
 
 const FString UTwitchHttpApi::API_BASE_URL = "https://api.twitch.tv/kraken";
 const FString UTwitchHttpApi::ACCESS_TOKEN_KEY = "access_token=";
-const FString UTwitchHttpApi::ACCESS_TOKEN_URI_CONTAINS = "https://localhost/#access_token";
+const FString UTwitchHttpApi::ACCESS_TOKEN_URI_CONTAINS = "http://localhost/#access_token";
 
 const FString UTwitchHttpApi::USER_ENDPOINT = "/user";
 const FString UTwitchHttpApi::CHANNEL_ENDPOINT = "/users?login=";
 const FString UTwitchHttpApi::SUBSCRIPTION_ENDPOINT = "/users/$1/subscriptions/$2";
+const FString UTwitchHttpApi::FOLLOWING_ENDPOINT = "/users/$1/follows/channels/$2";
 
 TSharedRef<IHttpRequest> UTwitchHttpApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, EHttpVerb Verb)
 {
@@ -53,7 +54,7 @@ FString UTwitchHttpApi::GetAuthenticationUrl(const FString& ClientId, bool Force
 {
     FString Url = "https://id.twitch.tv/oauth2/authorize";
     Url += "?client_id=" + ClientId;
-    Url += "&redirect_uri=https://localhost";
+    Url += "&redirect_uri=http://localhost";
     Url += "&response_type=token";
     if(ForceVerify == true)
     {
