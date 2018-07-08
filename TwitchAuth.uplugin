@@ -17,7 +17,7 @@
     {
       "Name": "TwitchAuth",
       "Type": "Runtime",
-      "LoadingPhase": "PreLoadingScreen",
+      "LoadingPhase": "Default",
       "WhitelistPlatforms": [
         "Win64",
         "Win32"
