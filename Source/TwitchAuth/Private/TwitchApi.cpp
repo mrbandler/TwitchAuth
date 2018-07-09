@@ -1,39 +1,39 @@
 // Copyright (c) 2018 fivefingergames.
 
-#include "TwitchHttpApi.h"
+#include "TwitchApi.h"
 
-FHttpModule* UTwitchHttpApi::Http = &FHttpModule::Get();
+const FString UTwitchApi::API_BASE_URL = TEXT("https://api.twitch.tv/kraken");
+const FString UTwitchApi::ACCESS_TOKEN_KEY = TEXT("access_token=");
+const FString UTwitchApi::ACCESS_TOKEN_URI_CONTAINS = TEXT("http://localhost/#access_token");
 
-const FString UTwitchHttpApi::API_BASE_URL = "https://api.twitch.tv/kraken";
-const FString UTwitchHttpApi::ACCESS_TOKEN_KEY = "access_token=";
-const FString UTwitchHttpApi::ACCESS_TOKEN_URI_CONTAINS = "http://localhost/#access_token";
+const FString UTwitchApi::USER_ENDPOINT = TEXT("/user");
+const FString UTwitchApi::CHANNEL_ENDPOINT = TEXT("/users?login=");
+const FString UTwitchApi::SUBSCRIPTION_ENDPOINT = TEXT("/users/$1/subscriptions/$2");
+const FString UTwitchApi::FOLLOWING_ENDPOINT = TEXT("/users/$1/follows/channels/$2");
 
-const FString UTwitchHttpApi::USER_ENDPOINT = "/user";
-const FString UTwitchHttpApi::CHANNEL_ENDPOINT = "/users?login=";
-const FString UTwitchHttpApi::SUBSCRIPTION_ENDPOINT = "/users/$1/subscriptions/$2";
-const FString UTwitchHttpApi::FOLLOWING_ENDPOINT = "/users/$1/follows/channels/$2";
-
-TSharedRef<IHttpRequest> UTwitchHttpApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, EHttpVerb Verb)
+TSharedRef<IHttpRequest> UTwitchApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, EHttpVerb Verb)
 {
+    FHttpModule* http = &FHttpModule::Get();
+
     // First let's created the result.
-    TSharedRef<IHttpRequest> result = Http->CreateRequest();
+    TSharedRef<IHttpRequest> result = http->CreateRequest();
 
     // Set the endpoint URL and the authorization header.
-    const FString url = UTwitchHttpApi::API_BASE_URL + Endpoint;
+    const FString url = UTwitchApi::API_BASE_URL + Endpoint;
     result->SetURL(url);
     result->SetHeader(TEXT("Authorization"), TEXT("OAuth " + AccessToken));
     result->SetHeader(TEXT("Client-ID"), ClientId);
     result->SetHeader(TEXT("Accept"), TEXT("application/vnd.twitchtv.v5+json"));
 
     // Last but not least set the HTTP verb.
-    FString verbStr = UTwitchHttpApi::GetHttpVerbStr(Verb);
+    FString verbStr = UTwitchApi::GetHttpVerbStr(Verb);
     result->SetVerb(verbStr);
 
     // And finally return the thing.
     return result;
 }
 
-FString UTwitchHttpApi::ExtractAccessToken(const FString& AccessTokenUrl)
+FString UTwitchApi::ExtractAccessToken(const FString& AccessTokenUrl)
 {
     FString result = "";
 
@@ -50,7 +50,7 @@ FString UTwitchHttpApi::ExtractAccessToken(const FString& AccessTokenUrl)
     return result;
 }
 
-FString UTwitchHttpApi::GetAuthenticationUrl(const FString& ClientId, bool ForceVerify)
+FString UTwitchApi::GetAuthenticationUrl(const FString& ClientId, bool ForceVerify)
 {
     FString Url = "https://id.twitch.tv/oauth2/authorize";
     Url += "?client_id=" + ClientId;
@@ -65,7 +65,7 @@ FString UTwitchHttpApi::GetAuthenticationUrl(const FString& ClientId, bool Force
     return Url;
 }
 
-FString UTwitchHttpApi::GetHttpVerbStr(EHttpVerb Verb)
+FString UTwitchApi::GetHttpVerbStr(EHttpVerb Verb)
 {
     // Init the result.
     FString result = "";
@@ -91,7 +91,7 @@ FString UTwitchHttpApi::GetHttpVerbStr(EHttpVerb Verb)
     return result;
 }
 
-bool UTwitchHttpApi::IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful)
+bool UTwitchApi::IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful)
 {
     // First check the easy stuff. 
     if(bWasSuccessful == false || Response.IsValid() == false) return false;
@@ -109,9 +109,11 @@ bool UTwitchHttpApi::IsResponseValid(FHttpResponsePtr Response, bool bWasSuccess
     }
 }
 
-FString UTwitchHttpApi::ExtractTwitchChannelUserFromResponseBody(const FString& ResponseBody)
+FString UTwitchApi::ExtractTwitchChannelUserFromResponseBody(const FString& ResponseBody)
 {
     int32 index = ResponseBody.Find("[") + 1;
     int32 charCount = (ResponseBody.Len() - 2) - index;
     return ResponseBody.Mid(index, charCount);
 }
+
+

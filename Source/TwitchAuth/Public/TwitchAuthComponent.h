@@ -2,15 +2,13 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
+#include "CoreMinimal.h"
 #include "WebBrowser.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
 #include "TwitchAuthTypes.h"
-#include "Private/TwitchHttpApi.h"
+#include "TwitchApi.h"
 #include "TwitchAuthComponent.generated.h"
-
-DECLARE_LOG_CATEGORY_EXTERN(LogTwitchAuth, Log, All);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAuthenticationPageLoaded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAccessTokenPageLoaded);

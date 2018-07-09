@@ -1,19 +1,10 @@
 // Copyright (c) 2018 fivefingergames.
 
 #include "TwitchAuthComponent.h"
-#include "Engine.h"
 #include "CoreMinimal.h"
-#include "Json.h"
 #include "JsonUtilities.h"
-#include "WebBrowser.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
-#include "Kismet/GameplayStatics.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
-#include "Private/TwitchHttpApi.h"
-#include "TwitchAuthTypes.h"
-
-DEFINE_LOG_CATEGORY(LogTwitchAuth);
 
 UTwitchAuthComponent::UTwitchAuthComponent()
 {
@@ -40,7 +31,7 @@ void UTwitchAuthComponent::Authenticate(UWebBrowser* WebBrowser)
         if(WebBrowser)
         {
             m_WebBrowser = WebBrowser;
-            FString url = UTwitchHttpApi::GetAuthenticationUrl(ClientId, bForceVerify);
+            FString url = UTwitchApi::GetAuthenticationUrl(ClientId, bForceVerify);
             m_WebBrowser->OnUrlChanged.AddDynamic(this, &UTwitchAuthComponent::HandleOnUrlChanged);
             m_WebBrowser->LoadURL(url);
         }
@@ -103,7 +94,7 @@ UWebBrowser* UTwitchAuthComponent::GetWebBrowser() const
 void UTwitchAuthComponent::LogError(const FTwitchError& twitchError) const
 {
     FString logMessage = twitchError.error + "(" + FString::FromInt(twitchError.status) + "): " + twitchError.message;
-    UE_LOG(LogTwitchAuth, Error, TEXT("%s"), *logMessage);
+    UE_LOG(LogTemp, Error, TEXT("TwitchAuth: %s"), *logMessage);
 }
 
 #pragma endregion // Protected
@@ -115,10 +106,10 @@ void UTwitchAuthComponent::LogError(const FTwitchError& twitchError) const
 void UTwitchAuthComponent::HandleOnUrlChanged(const FText& InText)
 {
     FString url = InText.ToString();
-    if(url.Contains(UTwitchHttpApi::ACCESS_TOKEN_URI_CONTAINS) == true)
+    if(url.Contains(UTwitchApi::ACCESS_TOKEN_URI_CONTAINS) == true)
     {
         OnAccessTokenPageLoaded.Broadcast();
-        m_AccessToken = UTwitchHttpApi::ExtractAccessToken(url);
+        m_AccessToken = UTwitchApi::ExtractAccessToken(url);
         ExecuteGetUserRequest();
     }
     else
@@ -134,7 +125,7 @@ void UTwitchAuthComponent::HandleOnUrlChanged(const FText& InText)
 void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
     // When the response comes in we first check if it is valid.
-    if(UTwitchHttpApi::IsResponseValid(Response, bWasSuccessful) == true)
+    if(UTwitchApi::IsResponseValid(Response, bWasSuccessful) == true)
     {
         // Based on the last endpoint we send a request to we handle the response.
         switch(m_LastEndpoint)
@@ -204,7 +195,7 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
 void UTwitchAuthComponent::ExecuteGetUserRequest()
 {
     // Create a request with the correct endpoint.
-    TSharedRef<IHttpRequest> request = UTwitchHttpApi::CreateHttpRequest(ClientId, m_AccessToken, UTwitchHttpApi::USER_ENDPOINT, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, UTwitchApi::USER_ENDPOINT, EHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     // Set the last endpoint so that the response handler knows what to do.
@@ -232,8 +223,8 @@ void UTwitchAuthComponent::HandleGetUserResponse(FHttpRequestPtr Request, FHttpR
 
 void UTwitchAuthComponent::ExecuteGetChannelRequest(const FString& ChannelName)
 {
-    const FString endpoint = UTwitchHttpApi::CHANNEL_ENDPOINT + ChannelName;
-    TSharedRef<IHttpRequest> request = UTwitchHttpApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    const FString endpoint = UTwitchApi::CHANNEL_ENDPOINT + ChannelName;
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     m_LastEndpoint = EEndpoint::Channels;
@@ -245,7 +236,7 @@ void UTwitchAuthComponent::HandleGetChannelResponse(FHttpRequestPtr Request, FHt
 {
     // Get the response body as a string.
     FString responseBody = Response->GetContentAsString();
-    responseBody = UTwitchHttpApi::ExtractTwitchChannelUserFromResponseBody(responseBody);
+    responseBody = UTwitchApi::ExtractTwitchChannelUserFromResponseBody(responseBody);
 
     // And convert the body to a struct.
     if(FJsonObjectConverter::JsonObjectStringToUStruct<FTwitchChannelUser>(responseBody, &m_TwitchChannelUser, 0, 0) == true)
@@ -276,11 +267,11 @@ void UTwitchAuthComponent::HandleGetChannelResponse(FHttpRequestPtr Request, FHt
 
 void UTwitchAuthComponent::ExecuteCheckUserSubscriptionRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel)
 {
-    FString endpoint = UTwitchHttpApi::SUBSCRIPTION_ENDPOINT;
+    FString endpoint = UTwitchApi::SUBSCRIPTION_ENDPOINT;
     endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
     endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
 
-    TSharedRef<IHttpRequest> request = UTwitchHttpApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     m_LastEndpoint = EEndpoint::Subscriptions;
@@ -301,11 +292,11 @@ void UTwitchAuthComponent::HandleCheckUserSubscriptionResponse(FHttpRequestPtr R
 
 void UTwitchAuthComponent::ExecuteCheckUserFollowingRequest(const FTwitchUser& TwitchUser, const FTwitchChannelUser& TwitchChannel)
 {
-    FString endpoint = UTwitchHttpApi::FOLLOWING_ENDPOINT;
+    FString endpoint = UTwitchApi::FOLLOWING_ENDPOINT;
     endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
     endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
 
-    TSharedRef<IHttpRequest> request = UTwitchHttpApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     m_LastEndpoint = EEndpoint::Following;
