@@ -6,8 +6,12 @@ public class TwitchAuth : ModuleRules
 {
 	public TwitchAuth(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+        // OptimizeCode = CodeOptimization.Never;
+        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		// 4.15 Include What You Use
+		// bEnforceIWYU = false;
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 				"TwitchAuth/Public",
