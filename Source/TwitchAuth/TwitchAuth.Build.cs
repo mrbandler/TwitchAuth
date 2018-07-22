@@ -25,7 +25,7 @@ public class TwitchAuth : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"TwitchAuth/Private",
-                "WebBrowserWidget/Private"
+                "WebBrowserWidget/Public"
 
                 // ... add other private include paths required here ...
             }
@@ -51,7 +51,7 @@ public class TwitchAuth : ModuleRules
 				"Slate",
 				"SlateCore",
                 "UMG",
-                "WebBrowser",
+                "WebBrowserWidget",
                 "Http",
                 "Json",
                 "JsonUtilities"

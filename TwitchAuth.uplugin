@@ -1,8 +1,8 @@
 {
   "FileVersion": 3,
   "Version": 1,
-  "VersionName": "1.1.0",
-  "FriendlyName": "TwitchAuth",
+  "VersionName": "1.1.2",
+  "FriendlyName": "Twitch Auth",
   "Description": "This plugin let's your players sign into Twitch from within your game to check if they are subscribers and or followers.",
   "Category": "Blueprints",
   "CreatedBy": "fivefingergames",
