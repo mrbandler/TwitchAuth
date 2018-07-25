@@ -1,4 +1,4 @@
-// Copyright (c) 2018 fivefingergames.
+// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -6,16 +6,10 @@ public class TwitchAuth : ModuleRules
 {
 	public TwitchAuth(ReadOnlyTargetRules Target) : base(Target)
 	{
-        // OptimizeCode = CodeOptimization.Never;
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		// 4.15 Include What You Use
-		// bEnforceIWYU = false;
-
+		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"TwitchAuth/Public",
-                "WebBrowserWidget/Public"
 
 				// ... add public include paths required here ...
 			}
@@ -24,11 +18,9 @@ public class TwitchAuth : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"TwitchAuth/Private",
-                "WebBrowserWidget/Public"
 
-                // ... add other private include paths required here ...
-            }
+				// ... add other private include paths required here ...
+			}
 			);
 			
 		
@@ -36,8 +28,8 @@ public class TwitchAuth : ModuleRules
 			new string[]
 			{
 				"Core",
-                "WebBrowserWidget"
-            
+				"WebBrowserWidget"
+
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -50,7 +42,6 @@ public class TwitchAuth : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "UMG",
                 "WebBrowserWidget",
                 "Http",
                 "Json",

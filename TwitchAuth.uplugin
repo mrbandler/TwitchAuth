@@ -1,33 +1,34 @@
 {
-  "FileVersion": 3,
-  "Version": 1,
-  "VersionName": "1.1.2",
-  "FriendlyName": "Twitch Auth",
-  "Description": "This plugin let's your players sign into Twitch from within your game to check if they are subscribers and or followers.",
-  "Category": "Blueprints",
-  "CreatedBy": "fivefingergames",
-  "CreatedByURL": "https://fivefingergames.com",
-  "DocsURL": "https://github.com/mrbandler/TwitchAuth/wiki",
-  "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/3a81d4366248477e86ccd5798f60536e",
-  "SupportURL": "support@fivefingergames.com",
-  "CanContainContent": true,
-  "IsBetaVersion": false,
-  "Installed": false,
-  "Modules": [
-    {
-      "Name": "TwitchAuth",
-      "Type": "Runtime",
-      "LoadingPhase": "Default",
-      "WhitelistPlatforms": [
-        "Win64",
-        "Win32"
-      ]
-    }
-  ],
-  "Plugins": [
-    {
-      "Name": "WebBrowserWidget",
-      "Enabled": true
-    }
-  ]
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.1.3",
+	"FriendlyName": "Twitch Auth",
+	"Description": "This plugin let's your players sign into Twitch from within your game to check if they are subscribers and or followers.",
+	"Category": "fivefingergames",
+	"CreatedBy": "fivefingergames",
+	"CreatedByURL": "https://fivefingergames.com",
+	"DocsURL": "https://github.com/mrbandler/TwitchAuth/wiki",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/3a81d4366248477e86ccd5798f60536e",
+	"SupportURL": "support@fivefingergames.com",
+	"EngineVersion": "4.20.0",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "TwitchAuth",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "WebBrowserWidget",
+			"Enabled": true
+		}
+	]
 }
