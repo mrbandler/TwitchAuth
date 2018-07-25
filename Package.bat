@@ -3,4 +3,5 @@ call RunUAT.bat BuildPlugin -Plugin="%CD%\TwitchAuth.uplugin" -Package="%CD%\Bui
 
 rem Zip the plugin
 rd /s /q "./Build/TwitchAuth/Intermediate"
+rd /s /q "./Build/TwitchAuth/Binaries"
 7z a ./Build/TwitchAuth.zip ./Build/TwitchAuth/*
