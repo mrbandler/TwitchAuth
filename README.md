@@ -21,8 +21,6 @@ The idea for this plugin came while watching the development stream from a fello
 
 I saw some flaws in this approach, because now you had to rely on the subscriber to keep the link a secret. I though there must be a better way. So, I set out to build this plugin to let any Twitch game developer have the ability to let potential subscriber play testers authenticate in-game. Now only subscribers to your channel can play the game.
 
-----
-
 ## 2. Installation
 
 To install the plugin simply download it over the [Unreal Engine Marketplace](https://www.unrealengine.com/marketplace). Click [here](https://www.unrealengine.com/marketplace/twitch-auth) to download.
@@ -35,19 +33,13 @@ Or install it engine wide in the ``<folder_to_your_ue4_installation/UE_4.19/Engi
 
 > **NOTE:** A detailed guide for both manual installation types can be found in the [wiki](https://github.com/mrbandler/TwitchAuth/wiki).
 
----
-
 ## 3. Usage
 
 Please check the [wiki](https://github.com/mrbandler/TwitchAuth/wiki) for documentation and in depth usage description.
 
----
-
 ## 4. Bugs and Features
 
 Please open a issue when you encounter any bugs 🐞 or have an idea for a new feature 💡.
-
----
 
 ## 5. Buy me a coffee
 
@@ -55,11 +47,9 @@ If you like you can buy me a coffee:
 
 [![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/mrbandler/)
 
-![Support via Bitcoin](https://cdn.rawgit.com/cjdowner/cryptocurrency-icons/master/svg/color/btc.svg) `3LqohnMDLdn2VtKChQMGJ7pQt8az2Zyqn4`
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/big/3KGsDx52prxWciBkfNJYBkXaTJ6GUURP2c)](https://en.cryptobadges.io/donate/3KGsDx52prxWciBkfNJYBkXaTJ6GUURP2c)
 
-![Support via Ethereum](https://cdn.rawgit.com/cjdowner/cryptocurrency-icons/master/svg/color/eth.svg) `0x783A54Cd23077E0d1cB360c7125e04b8b5740Fb0`
-
-![Support via Litecoin](https://cdn.rawgit.com/cjdowner/cryptocurrency-icons/master/svg/color/ltc.svg) `MFB3QUUyL6iYumszEGZeiprM49XrKMXgtm`
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/big/0xd6Ffc89Bc87f7dFdf0ef1aefF956634d4B7451c8)](https://en.cryptobadges.io/donate/0xd6Ffc89Bc87f7dFdf0ef1aefF956634d4B7451c8)
 
 ---
 
