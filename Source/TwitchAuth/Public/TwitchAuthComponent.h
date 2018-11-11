@@ -34,7 +34,7 @@ public:
      *
      * @brief   Default constructor.
      */
-    UTwitchAuthComponent();
+	UTwitchAuthComponent();
 
     /** Client ID from your Twitch application. */
     UPROPERTY(EditDefaultsOnly, Category = "Twitch Auth")

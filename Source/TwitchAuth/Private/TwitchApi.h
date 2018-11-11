@@ -54,7 +54,7 @@ enum class ETwitchRequest : uint8
  * 
  */
 UCLASS()
-class UTwitchApi : public UObject
+class TWITCHAUTH_API UTwitchApi : public UObject
 {
 	GENERATED_BODY()
 	
