@@ -2,8 +2,7 @@
 
 [![Download on UE4 Marketplace](https://img.shields.io/badge/UE4-Marketplace-lightgrey.svg)](https://www.unrealengine.com/marketplace/twitch-auth) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/98eab67a0480440a825f6b910f54d67f)](https://app.codacy.com/app/mrbandler/TwitchAuth?utm_source=github.com&utm_medium=referral&utm_content=mrbandler/TwitchAuth&utm_campaign=Badge_Grade_Dashboard) [![Donate with Bitcoin](https://en.cryptobadges.io/badge/micro/3KGsDx52prxWciBkfNJYBkXaTJ6GUURP2c)](https://en.cryptobadges.io/donate/3KGsDx52prxWciBkfNJYBkXaTJ6GUURP2c) [![Donate with Litecoin](https://en.cryptobadges.io/badge/micro/LcHsJH13A8PmHJQwpbWevGUebZwhWNMXgS)](https://en.cryptobadges.io/donate/LcHsJH13A8PmHJQwpbWevGUebZwhWNMXgS) [![Donate with Ethereum](https://en.cryptobadges.io/badge/micro/0xd6Ffc89Bc87f7dFdf0ef1aefF956634d4B7451c8)](https://en.cryptobadges.io/donate/0xd6Ffc89Bc87f7dFdf0ef1aefF956634d4B7451c8) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/mrbandler/)
 
-
-**This is a Unreal Engine 4 plugin for In-Game Twitch Authentication.**
+**This is a Unreal Engine 4 plugin for In-Game Twitch Authentication.** 
 
 ![TwitchAuth](https://github.com/mrbandler/TwitchAuth/raw/master/Images/%231.png)
 
