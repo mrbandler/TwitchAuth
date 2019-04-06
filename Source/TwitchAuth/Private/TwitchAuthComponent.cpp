@@ -2,7 +2,7 @@
 
 #include "TwitchAuthComponent.h"
 #include "CoreMinimal.h"
-#include "JsonUtilities.h"
+#include "JsonObjectConverter.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
 
