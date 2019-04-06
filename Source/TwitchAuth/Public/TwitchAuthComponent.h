@@ -213,7 +213,7 @@ private:
     ETwitchRequest m_TwitchRequest = ETwitchRequest::None;
 
     /** The last endpoint a request was send to. */
-    EEndpoint m_LastEndpoint = EEndpoint::None;
+	ETwitchEndpoint m_LastEndpoint = ETwitchEndpoint::None;
 
     /** The authenticated Twitch user from the Authentication process. */
     FTwitchUser m_TwitchUser;
