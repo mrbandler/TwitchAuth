@@ -13,7 +13,7 @@
 * @brief   Values that represent HTTP verbs.
 */
 UENUM()
-enum class EHttpVerb : uint8
+enum class ETwitchHttpVerb : uint8
 {
     Get,
     Post,
@@ -28,7 +28,7 @@ enum class EHttpVerb : uint8
 * @brief   Values that represent Twitch API endpoints.
 */
 UENUM()
-enum class EEndpoint : uint8
+enum class ETwitchEndpoint : uint8
 {
     None,
     User,
@@ -125,7 +125,7 @@ public:
     *
     * @return  The HTTP verb string.
     */
-    static FString GetHttpVerbStr(EHttpVerb Verb);
+    static FString GetHttpVerbStr(ETwitchHttpVerb Verb);
 
     /**
     * @fn  static bool UTwitchHttpApi::IsResponseValid(FHttpResponsePtr Response, bool bWasSuccessful);
@@ -151,6 +151,6 @@ public:
     *
     * @return  The new HTTP request.
     */
-    static TSharedRef<IHttpRequest> CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, EHttpVerb Verb);
+    static TSharedRef<IHttpRequest> CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, ETwitchHttpVerb Verb);
 	
 };

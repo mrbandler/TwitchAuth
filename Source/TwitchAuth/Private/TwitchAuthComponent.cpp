@@ -2,7 +2,7 @@
 
 #include "TwitchAuthComponent.h"
 #include "CoreMinimal.h"
-#include "JsonUtilities.h"
+#include "JsonObjectConverter.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
 
@@ -130,26 +130,26 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
         // Based on the last endpoint we send a request to we handle the response.
         switch(m_LastEndpoint)
         {
-            case EEndpoint::User:
-                m_LastEndpoint = EEndpoint::None;
+            case ETwitchEndpoint::User:
+                m_LastEndpoint = ETwitchEndpoint::None;
 
                 HandleGetUserResponse(Request, Response);
                 break;
 
-            case EEndpoint::Channels:
-                m_LastEndpoint = EEndpoint::None;
+            case ETwitchEndpoint::Channels:
+                m_LastEndpoint = ETwitchEndpoint::None;
 
                 HandleGetChannelResponse(Request, Response);
                 break;
 
-            case EEndpoint::Subscriptions:
-                m_LastEndpoint = EEndpoint::None;
+            case ETwitchEndpoint::Subscriptions:
+                m_LastEndpoint = ETwitchEndpoint::None;
 
                 HandleCheckUserSubscriptionResponse(Request, Response);
                 break;
 
-            case EEndpoint::Following:
-                m_LastEndpoint = EEndpoint::None;
+            case ETwitchEndpoint::Following:
+                m_LastEndpoint = ETwitchEndpoint::None;
 
                 HandleCheckUserFollowingResponse(Request, Response);
                 break;
@@ -165,22 +165,22 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
 
         switch(m_LastEndpoint)
         {
-            case EEndpoint::Following:
+            case ETwitchEndpoint::Following:
                 LogError(m_LastError);
                 OnUserFollowingChannel.Broadcast(false, m_TwitchFollow);
                 break;
 
-            case EEndpoint::Subscriptions:
+            case ETwitchEndpoint::Subscriptions:
                 LogError(m_LastError);
                 OnUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
                 break;
 
-            case EEndpoint::Channels:
+            case ETwitchEndpoint::Channels:
                 LogError(m_LastError);
                 OnUserSubscribedToChannel.Broadcast(false, m_TwitchSubscription);
                 break;
 
-            case EEndpoint::User:
+            case ETwitchEndpoint::User:
                 LogError(m_LastError);
                 OnUserAuthenticated.Broadcast(false);
                 break;
@@ -195,11 +195,11 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
 void UTwitchAuthComponent::ExecuteGetUserRequest()
 {
     // Create a request with the correct endpoint.
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, UTwitchApi::USER_ENDPOINT, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, UTwitchApi::USER_ENDPOINT, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     // Set the last endpoint so that the response handler knows what to do.
-    m_LastEndpoint = EEndpoint::User;
+    m_LastEndpoint = ETwitchEndpoint::User;
 
     // Send the request.
     request->ProcessRequest();
@@ -224,10 +224,10 @@ void UTwitchAuthComponent::HandleGetUserResponse(FHttpRequestPtr Request, FHttpR
 void UTwitchAuthComponent::ExecuteGetChannelRequest(const FString& ChannelName)
 {
     const FString endpoint = UTwitchApi::CHANNEL_ENDPOINT + ChannelName;
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
-    m_LastEndpoint = EEndpoint::Channels;
+    m_LastEndpoint = ETwitchEndpoint::Channels;
 
     request->ProcessRequest();
 }
@@ -271,10 +271,10 @@ void UTwitchAuthComponent::ExecuteCheckUserSubscriptionRequest(const FTwitchUser
     endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
     endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
 
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
-    m_LastEndpoint = EEndpoint::Subscriptions;
+    m_LastEndpoint = ETwitchEndpoint::Subscriptions;
 
     request->ProcessRequest();
 }
@@ -296,10 +296,10 @@ void UTwitchAuthComponent::ExecuteCheckUserFollowingRequest(const FTwitchUser& T
     endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
     endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
 
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, EHttpVerb::Get);
+    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
-    m_LastEndpoint = EEndpoint::Following;
+    m_LastEndpoint = ETwitchEndpoint::Following;
 
     request->ProcessRequest();
 }

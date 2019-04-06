@@ -11,7 +11,7 @@ const FString UTwitchApi::CHANNEL_ENDPOINT = TEXT("/users?login=");
 const FString UTwitchApi::SUBSCRIPTION_ENDPOINT = TEXT("/users/$1/subscriptions/$2");
 const FString UTwitchApi::FOLLOWING_ENDPOINT = TEXT("/users/$1/follows/channels/$2");
 
-TSharedRef<IHttpRequest> UTwitchApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, EHttpVerb Verb)
+TSharedRef<IHttpRequest> UTwitchApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, ETwitchHttpVerb Verb)
 {
     FHttpModule* http = &FHttpModule::Get();
 
@@ -65,7 +65,7 @@ FString UTwitchApi::GetAuthenticationUrl(const FString& ClientId, bool ForceVeri
     return Url;
 }
 
-FString UTwitchApi::GetHttpVerbStr(EHttpVerb Verb)
+FString UTwitchApi::GetHttpVerbStr(ETwitchHttpVerb Verb)
 {
     // Init the result.
     FString result = "";
@@ -73,15 +73,15 @@ FString UTwitchApi::GetHttpVerbStr(EHttpVerb Verb)
     // Set the result variable based on the given enum value.
     switch(Verb)
     {
-        case EHttpVerb::Get: result = "GET";
+        case ETwitchHttpVerb::Get: result = "GET";
             break;
-        case EHttpVerb::Post: result = "POST";
+        case ETwitchHttpVerb::Post: result = "POST";
             break;
-        case EHttpVerb::Put: result = "PUT";
+        case ETwitchHttpVerb::Put: result = "PUT";
             break;
-        case EHttpVerb::Patch: result = "PATCH";
+        case ETwitchHttpVerb::Patch: result = "PATCH";
             break;
-        case EHttpVerb::Delete: result = "DELETE";
+        case ETwitchHttpVerb::Delete: result = "DELETE";
             break;
         default:
             break;
