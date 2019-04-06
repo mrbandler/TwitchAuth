@@ -10,7 +10,7 @@
 	"DocsURL": "https://github.com/mrbandler/TwitchAuth/wiki",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/3a81d4366248477e86ccd5798f60536e",
 	"SupportURL": "support@fivefingergames.com",
-	"EngineVersion": "4.21.0",
+	"EngineVersion": "4.22.0",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"Installed": false,
