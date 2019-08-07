@@ -37,7 +37,7 @@ Or install it engine wide in the ``<folder_to_your_ue4_installation/UE_4.19/Engi
 
 ## 3. Usage
 
-Please check the [wiki](https://github.com/mrbandler/TwitchAuth/wiki) for documentation and in depth usage description.
+Please check the [docs](https://docs.fivefingergames.com/twitch-auth) for documentation and in depth usage description.
 
 ## 4. Bugs and Features
 
