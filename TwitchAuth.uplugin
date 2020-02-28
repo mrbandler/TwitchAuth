@@ -1,7 +1,7 @@
 {
     "FileVersion": 3,
     "Version": 1,
-    "VersionName": "1.1.7",
+    "VersionName": "1.1.8",
     "FriendlyName": "Twitch Auth",
     "Description": "This plugin let's your players sign into Twitch from within your game to check if they are subscribers and or followers.",
     "Category": "fivefingergames",
@@ -10,7 +10,7 @@
     "DocsURL": "https://docs.fivefingergames.com/twitch-auth/",
     "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/3a81d4366248477e86ccd5798f60536e",
     "SupportURL": "support@fivefingergames.com",
-    "EngineVersion": "4.23.0",
+    "EngineVersion": "4.24.0",
     "CanContainContent": true,
     "IsBetaVersion": false,
     "Installed": false,
