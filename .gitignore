@@ -429,3 +429,5 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/unrealengine,visualstudio,visualstudiocode
+
+dist
