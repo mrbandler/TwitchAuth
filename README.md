@@ -35,7 +35,7 @@ To install the plugin simply download it over the [Unreal Engine Marketplace](ht
 
 Download the plugin via the releases tab, unzip the archive and drop the unzipped folder into either a local plugins folder on your project. If your project is a blueprint only project simply add a dummy C++ class to you project to create the plugins folder.
 
-Or install it engine wide in the ``<folder_to_your_ue4_installation/UE_4.19/Engine/Plugins``. If you didn't change the installation directory of your UE4 installation the folder should be under ``C:\Program Files\Epic Games\UE_4<version>\Engine\Plugins``.
+Or install it engine wide in the ``<folder_to_your_ue4_installation/UE_4.<version>/Engine/Plugins``. If you didn't change the installation directory of your UE4 installation the folder should be under ``C:\Program Files\Epic Games\UE_4.<version>\Engine\Plugins``.
 
 > **NOTE:** A detailed guide for both manual installation types can be found in the [wiki](https://github.com/mrbandler/TwitchAuth/wiki).
 
