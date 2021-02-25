@@ -11,12 +11,12 @@ const FString UTwitchApi::CHANNEL_ENDPOINT = TEXT("/users?login=");
 const FString UTwitchApi::SUBSCRIPTION_ENDPOINT = TEXT("/users/$1/subscriptions/$2");
 const FString UTwitchApi::FOLLOWING_ENDPOINT = TEXT("/users/$1/follows/channels/$2");
 
-TSharedRef<IHttpRequest> UTwitchApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, ETwitchHttpVerb Verb)
+TSharedRef<IHttpRequest, ESPMode::ThreadSafe> UTwitchApi::CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, ETwitchHttpVerb Verb)
 {
     FHttpModule* http = &FHttpModule::Get();
 
     // First let's created the result.
-    TSharedRef<IHttpRequest> result = http->CreateRequest();
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> result = http->CreateRequest();
 
     // Set the endpoint URL and the authorization header.
     const FString url = UTwitchApi::API_BASE_URL + Endpoint;
