@@ -151,6 +151,6 @@ public:
     *
     * @return  The new HTTP request.
     */
-    static TSharedRef<IHttpRequest> CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, ETwitchHttpVerb Verb);
+    static TSharedRef<IHttpRequest, ESPMode::ThreadSafe> CreateHttpRequest(const FString& ClientId, const FString& AccessToken, const FString& Endpoint, ETwitchHttpVerb Verb);
 	
 };

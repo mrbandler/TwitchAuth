@@ -195,7 +195,7 @@ void UTwitchAuthComponent::OnResponseReceived(FHttpRequestPtr Request, FHttpResp
 void UTwitchAuthComponent::ExecuteGetUserRequest()
 {
     // Create a request with the correct endpoint.
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, UTwitchApi::USER_ENDPOINT, ETwitchHttpVerb::Get);
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, UTwitchApi::USER_ENDPOINT, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     // Set the last endpoint so that the response handler knows what to do.
@@ -224,7 +224,7 @@ void UTwitchAuthComponent::HandleGetUserResponse(FHttpRequestPtr Request, FHttpR
 void UTwitchAuthComponent::ExecuteGetChannelRequest(const FString& ChannelName)
 {
     const FString endpoint = UTwitchApi::CHANNEL_ENDPOINT + ChannelName;
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     m_LastEndpoint = ETwitchEndpoint::Channels;
@@ -271,7 +271,7 @@ void UTwitchAuthComponent::ExecuteCheckUserSubscriptionRequest(const FTwitchUser
     endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
     endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
 
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     m_LastEndpoint = ETwitchEndpoint::Subscriptions;
@@ -296,7 +296,7 @@ void UTwitchAuthComponent::ExecuteCheckUserFollowingRequest(const FTwitchUser& T
     endpoint = endpoint.Replace(TEXT("$1"), *TwitchUser._id);
     endpoint = endpoint.Replace(TEXT("$2"), *TwitchChannel._id);
 
-    TSharedRef<IHttpRequest> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> request = UTwitchApi::CreateHttpRequest(ClientId, m_AccessToken, endpoint, ETwitchHttpVerb::Get);
     request->OnProcessRequestComplete().BindUObject(this, &UTwitchAuthComponent::OnResponseReceived);
 
     m_LastEndpoint = ETwitchEndpoint::Following;
