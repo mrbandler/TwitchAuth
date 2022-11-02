@@ -58,7 +58,7 @@ FString UTwitchApi::GetAuthenticationUrl(const FString& ClientId, bool ForceVeri
     Url += "&response_type=token";
     if(ForceVerify == true)
     {
-        Url += "&force_varify=true";
+        Url += "&force_verify=true";
     }
     Url += "&scope=user_read user_subscriptions";
 
